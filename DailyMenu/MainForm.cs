@@ -1,4 +1,7 @@
+using DailyMenu.IO.Xml;
 using System.Drawing.Text;
+using LocalUtilities.SerializeUtilities;
+using LocalUtilities.ManageUtilities;
 
 namespace DailyMenu
 {
@@ -9,6 +12,9 @@ namespace DailyMenu
             InitializeComponent();
             DrawClient();
             SizeChanged += MainForm_SizeChanged;
+            _ = new MembersXmlSerialization().LoadFromXml("test.xml", out var members);
+            _members = members ?? _members;
+            _members.SaveToXml("test.xml", new MembersXmlSerialization());
         }
         private void InitializeComponent()
         {
@@ -44,7 +50,7 @@ namespace DailyMenu
             DrawClient();
         }
 
-        private Members members = new();
+        private Members _members = new();
 
         PictureBox MemberList = new();
 
@@ -85,9 +91,9 @@ namespace DailyMenu
             //stringFormat.LineAlignment = StringAlignment.Center;
             //stringFormat.Alignment = StringAlignment.Center;
             string content = "";
-            foreach (var member in members.MemberList)
+            foreach (var member in _members.MemberList)
             {
-                content += $"{member.Name}£º{members.Percentage(member)}\n";
+                content += $"{member.Name}£º{_members.Percentage(member)}\n";
             }
             gMembers.DrawString(
                 content,

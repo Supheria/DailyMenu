@@ -13,7 +13,7 @@ public class Member
     /// <summary>
     /// 名字
     /// </summary>
-    public string Name { get; set; } = "null";
+    public string Name { get; set; } = string.Empty;
     /// <summary>
     /// 身高(m)
     /// </summary>
@@ -56,12 +56,8 @@ public class Member
     /// <param name="height"></param>
     /// <param name="weight"></param>
     /// <param name="workIntensity"></param>
-    public Member(string name, float height, float weight, WorkIntensityFlag workIntensity)
+    public Member()
     {
-        Name = name;
-        Height = height;
-        Weight = weight;
-        WorkIntensity = workIntensity;
     }
     /// <summary>
     /// 每日所需能量

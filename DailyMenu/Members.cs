@@ -12,7 +12,7 @@ namespace DailyMenu
         /// <summary>
         /// 以 Name 作为 Key 的所有成员
         /// </summary>
-        private Dictionary<string, Member> _memberMap { get; set; } = new();
+        private Dictionary<string, Member> _memberMap;
         /// <summary>
         /// 成员列表
         /// </summary>
@@ -27,18 +27,40 @@ namespace DailyMenu
             get => _memberMap[name];
             set => _memberMap[name] = value;
         }
-
+        /// <summary>
+        /// 每日所需总能量
+        /// </summary>
+        public float TotalDailyEnergy
+        {
+            get
+            {
+                float totalDailyEnergy = 0f;
+                foreach (var m in MemberList)
+                {
+                    totalDailyEnergy += m.DailyEnergy();
+                }
+                return totalDailyEnergy;
+            }
+        }
         public Members()
         {
             _memberMap = new()
             {
-                ["AAA"] = new Member("AAA", 1.82f, 63f, Flags.WorkIntensityFlag.Weak),
-                ["BBB"] = new Member("BBB", 1.86f, 90f, Flags.WorkIntensityFlag.Weak),
-                ["CCC"] = new Member("CCC", 1.68f, 60f, Flags.WorkIntensityFlag.Weak),
+                //["AAA"] = new()
+                //{
+                //    Name = "AAA",
+                //    Height = 1.82f,
+                //    Weight = 63f,
+                //    WorkIntensity = Flags.WorkIntensityFlag.Weak,
+                //},
 
             };
         }
-
+        public Members(Member[] members) : this()
+        {
+            foreach(var m in members)
+                _memberMap[m.Name] = m;
+        }
         /// <summary>
         /// 个人能量占比
         /// </summary>
@@ -48,12 +70,8 @@ namespace DailyMenu
         {
             if (!_memberMap.ContainsKey(member.Name))
                 return "NAME_NOT_FOUND";
-            float totalDailyEnergy = 0f;
-            foreach (var m in MemberList)
-            {
-                totalDailyEnergy += m.DailyEnergy();
-            }
-            return $"{_memberMap[member.Name].DailyEnergy() / totalDailyEnergy * 100}%";
+            
+            return $"{_memberMap[member.Name].DailyEnergy() / TotalDailyEnergy * 100}%";
         }
     }
 }
