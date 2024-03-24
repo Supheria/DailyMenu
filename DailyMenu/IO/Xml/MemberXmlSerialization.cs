@@ -12,16 +12,14 @@ using System.Xml.Serialization;
 
 namespace DailyMenu.IO.Xml;
 
-[XmlRoot("Member")]
-public class MemberXmlSerialization : Serialization<Member>, IXmlSerialization<Member>
+[XmlRoot(nameof(Member))]
+public class MemberXmlSerialization : XmlSerialization<Member>
 {
-    public MemberXmlSerialization() : base("Member")
+    public MemberXmlSerialization() : base(nameof(Member))
     {
     }
 
-    public XmlSchema? GetSchema() => null;
-
-    public void ReadXml(XmlReader reader)
+    public override void ReadXml(XmlReader reader)
     {
         Source = new()
         {
@@ -32,7 +30,7 @@ public class MemberXmlSerialization : Serialization<Member>, IXmlSerialization<M
     };
     }
 
-    public void WriteXml(XmlWriter writer)
+    public override void WriteXml(XmlWriter writer)
     {
         if (Source is null)
             return;

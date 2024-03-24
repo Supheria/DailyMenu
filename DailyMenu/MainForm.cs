@@ -2,25 +2,49 @@ using DailyMenu.IO.Xml;
 using System.Drawing.Text;
 using LocalUtilities.SerializeUtilities;
 using LocalUtilities.ManageUtilities;
+using System.Windows.Forms;
 
 namespace DailyMenu
 {
     public partial class MainForm : Form
     {
+        private readonly MemberForm MemberManager = new();
+
         public MainForm()
         {
             InitializeComponent();
-            DrawClient();
             SizeChanged += MainForm_SizeChanged;
             _ = new MembersXmlSerialization().LoadFromXml("test.xml", out var members);
             _members = members ?? _members;
             _members.SaveToXml("test.xml", new MembersXmlSerialization());
+            DrawClient();
         }
+
         private void InitializeComponent()
         {
-            SuspendLayout();
             var backColor = Color.White;
             var foreColor = Color.DarkBlue;
+            // 
+            // MainMenu
+            // 
+            MainMenu.ImageScalingSize = new Size(24, 24);
+            MainMenu.Items.AddRange(new ToolStripItem[] 
+            { 
+                MainMenu_Member,
+            });
+            MainMenu.Location = new Point(0, 0);
+            MainMenu.Name = "MainMenu";
+            MainMenu.Padding = new Padding(9, 3, 0, 3);
+            MainMenu.Size = new Size(1232, 34);
+            MainMenu.TabIndex = 1;
+            MainMenu.Text = "MainMenu";
+            // 
+            // MainMenu_Member
+            // 
+            MainMenu_Member.Name = "MainMenu_Member";
+            MainMenu_Member.Size = new Size(62, 28);
+            MainMenu_Member.Text = "≥…‘±";
+            MainMenu_Member.Click += MainMenu_Member_Click;
             //
             // main
             //
@@ -31,6 +55,7 @@ namespace DailyMenu
             Controls.AddRange(new Control[]
             {
                 MemberList,
+                MainMenu,
             });
             TopMost = true;
             //MinimumSize = Size = new((int)(500 * SizeRatio), 500);
@@ -42,7 +67,11 @@ namespace DailyMenu
             //MinimizeBox = MaximizeBox = false;
             DoubleBuffered = true;
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
-            ResumeLayout();
+        }
+
+        private void MainMenu_Member_Click(object? sender, EventArgs e)
+        {
+            MemberManager.Show();
         }
 
         private void MainForm_SizeChanged(object? sender, EventArgs e)
@@ -53,6 +82,8 @@ namespace DailyMenu
         private Members _members = new();
 
         PictureBox MemberList = new();
+        private MenuStrip MainMenu = new();
+        private ToolStripMenuItem MainMenu_Member = new();
 
         protected virtual void DrawClient()
         {
@@ -68,7 +99,7 @@ namespace DailyMenu
             //MemberList
             //
             MemberList.Left = ClientRectangle.Left + padding;
-            MemberList.Top = (int)(ClientRectangle.Top + padding * 1.5f);
+            MemberList.Top = (int)(MainMenu.Bottom + padding * 1.5f);
             MemberList.Width = (int)(ClientRectangle.Width - padding * 2.5);
             MemberList.Height = (int)(ClientRectangle.Height - padding * 2.5);
             //

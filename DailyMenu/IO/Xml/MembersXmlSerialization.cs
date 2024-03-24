@@ -11,23 +11,21 @@ using LocalUtilities.SerializeUtilities;
 
 namespace DailyMenu.IO.Xml;
 
-[XmlRoot("Members")]
-public class MembersXmlSerialization : Serialization<Members>, IXmlSerialization<Members>
+[XmlRoot(nameof(Members))]
+public class MembersXmlSerialization : XmlSerialization<Members>
 {
-    public MembersXmlSerialization() : base("Members")
+    public MembersXmlSerialization() : base(nameof(Members))
     {
     }
 
-    public XmlSchema? GetSchema() => null;
-
-    public void ReadXml(XmlReader reader)
+    public override void ReadXml(XmlReader reader)
     {
         var members = new List<Member>();
         members.ReadXmlCollection(reader, LocalRootName, new MemberXmlSerialization());
         Source = new(members.ToArray());
     }
 
-    public void WriteXml(XmlWriter writer)
+    public override void WriteXml(XmlWriter writer)
     {
         if (Source is null)
             return;
