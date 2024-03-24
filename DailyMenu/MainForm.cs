@@ -57,7 +57,6 @@ namespace DailyMenu
                 MemberList,
                 MainMenu,
             });
-            TopMost = true;
             //MinimumSize = Size = new((int)(500 * SizeRatio), 500);
             BackColor = backColor;
             Location = new(
@@ -72,6 +71,7 @@ namespace DailyMenu
         private void MainMenu_Member_Click(object? sender, EventArgs e)
         {
             MemberManager.Show();
+            MemberManager.WindowState = FormWindowState.Normal;
         }
 
         private void MainForm_SizeChanged(object? sender, EventArgs e)
