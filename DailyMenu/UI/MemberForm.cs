@@ -18,6 +18,7 @@ public partial class MemberForm : Form
     internal float LengthMaxlRatio = 3f;
 
     private Members _members = new();
+    private bool _resizing = false;
 
     public MemberForm()
     {
@@ -25,12 +26,27 @@ public partial class MemberForm : Form
 
         FormClosing += MemberForm_FormClosing;
         SizeChanged += MemberForm_SizeChanged;
+        ResizeEnd += MemberForm_ResizeEnd;
+        ResizeBegin += MemberForm_ResizeBegin;
 
+        DrawClient();
+    }
+
+    private void MemberForm_ResizeBegin(object? sender, EventArgs e)
+    {
+        _resizing = true;
+    }
+
+    private void MemberForm_ResizeEnd(object? sender, EventArgs e)
+    {
+        _resizing = false;
         DrawClient();
     }
 
     private void MemberForm_SizeChanged(object? sender, EventArgs e)
     {
+        if (_resizing)
+            return;
         DrawClient();
     }
 
