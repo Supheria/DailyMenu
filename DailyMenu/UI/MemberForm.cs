@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using DailyMenu.Data;
 using DailyMenu.Data.Model;
 using DailyMenu.Flags;
+using LocalUtilities.ManageUtilities;
 using LocalUtilities.StringUtilities;
 
 namespace DailyMenu.UI;
@@ -24,15 +25,37 @@ public partial class MemberForm : Form
     private Members _members = new();
     private bool _resizing = false;
 
+    #region ==== Main Events ====
+
     public MemberForm()
     {
         InitializeComponent();
 
+        FormClosing += MemberForm_FormClosing;
         SizeChanged += MemberForm_SizeChanged;
         ResizeEnd += MemberForm_ResizeEnd;
         ResizeBegin += MemberForm_ResizeBegin;
 
         DrawClient();
+    }
+
+    private void MemberForm_FormClosing(object? sender, FormClosingEventArgs e)
+    {
+        if (MemberRoster.Roster.IsEdit() is false)
+        {
+            MemberRoster.Roster.ClearCache();
+            return;
+        }
+        var result = MessageBox.Show("是否保存当前编辑？", "提示", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+        switch (result)
+        {
+            case DialogResult.Cancel:
+                e.Cancel = true;
+                break;
+            case DialogResult.Yes:
+                MemberRoster.Save();
+                break;
+        }
     }
 
     private void MemberForm_ResizeBegin(object? sender, EventArgs e)
@@ -53,7 +76,38 @@ public partial class MemberForm : Form
         DrawClient();
     }
 
-    protected virtual void DrawClient()
+    private new void Refresh()
+    {
+        this.MemberList.BeginUpdate();
+
+        MemberList.Items.Clear();
+        foreach (var m in MemberRoster.Roster.MemberList)
+        {
+            var item = new ListViewItem();
+            item.Text = m.Name;
+            item.SubItems.Add(m.Height.ToString());
+            item.SubItems.Add(m.Weight.ToString());
+            item.SubItems.Add(m.WorkIntensity.ToDescription());
+
+            this.MemberList.Items.Add(item);
+        }
+        this.MemberList.EndUpdate();
+
+        Invalidate();
+    }
+
+    public new void ShowDialog()
+    {
+        Refresh();
+        base.ShowDialog();
+    }
+
+    #endregion
+
+
+    #region ==== Draw Client ====
+
+    private void DrawClient()
     {
         if (WindowState == FormWindowState.Minimized)
         {
@@ -184,45 +238,10 @@ public partial class MemberForm : Form
         ResumeLayout();
     }
 
-    private void Edit_Click(object? sender, EventArgs e)
-    {
-        MemberRoster.Roster[Name.Text] = new Member()
-        {
-            Name = Name.Text,
-            Height = Height.Text.ToFloat() ?? 0f,
-            Weight = Weight.Text.ToFloat() ?? 0f,
-            WorkIntensity = WorkIntensity.Text.DescriptionToEnum<WorkIntensityFlag>()
-        };
+    #endregion
 
-        Refresh();
-    }
 
-    private new void Refresh()
-    {
-        this.MemberList.BeginUpdate();   //数据更新，UI暂时挂起，直到EndUpdate绘制控件，可以有效避免闪烁并大大提高加载速度
-
-        MemberList.Items.Clear();
-        foreach(var m in MemberRoster.Roster.MemberList)
-        {
-            var item = new ListViewItem();
-            item.Text = m.Name;
-            item.SubItems.Add(m.Height.ToString());
-            item.SubItems.Add(m.Weight.ToString());
-            item.SubItems.Add(m.WorkIntensity.ToDescription());
-
-            this.MemberList.Items.Add(item);
-        }
-
-        this.MemberList.EndUpdate();  //结束数据处理，UI界面一次性绘制。
-
-        Invalidate();
-    }
-
-    public new void ShowDialog()
-    {
-        Refresh();
-        base.ShowDialog();
-    }
+    #region ==== Initialize ====
 
     private void InitializeComponent()
     {
@@ -394,33 +413,6 @@ public partial class MemberForm : Form
         DailyEnergyHeader.TextAlign = HorizontalAlignment.Left;
     }
 
-    private void Float_KeyPress(object? sender, KeyPressEventArgs e)
-    {
-        var tb = sender as TextBox;
-        if (tb is null)
-            return;
-        if (e.KeyChar is '.' && (tb.Text.IndexOf('.') is not -1 || tb.Text.Length is 0))
-            e.Handled = true;
-        if (!(e.KeyChar is '\b' || (e.KeyChar >='0' && e.KeyChar <= '9') || e.KeyChar is '.'))
-            e.Handled = true;
-    }
-
-    private void Save_Click(object? sender, EventArgs e)
-    {
-        MemberRoster.Save();
-    }
-
-    private void MemberList_SelectedIndexChanged(object? sender, EventArgs e)
-    {
-        if (MemberList.SelectedItems.Count is 0)
-            return;
-        Name.Text = MemberList.SelectedItems[0].SubItems[0].Text;
-        Height.Text = MemberList.SelectedItems[0].SubItems[1].Text.ToFloat().ToString();
-        Weight.Text = MemberList.SelectedItems[0].SubItems[2].Text.ToFloat().ToString();
-        var flag = MemberList.SelectedItems[0].SubItems[3].Text.DescriptionToEnum<WorkIntensityFlag>();
-        WorkIntensity.SelectedIndex = flag is WorkIntensityFlag.None ? 0 : (int)flag - 1;
-    }
-
     System.Windows.Forms.Label NameLabel = new();
     System.Windows.Forms.Label HeightLabel = new();
     System.Windows.Forms.Label WeightLabel = new();
@@ -439,4 +431,55 @@ public partial class MemberForm : Form
     System.Windows.Forms.ColumnHeader WorkIntensityHeader = new();
     System.Windows.Forms.ColumnHeader BmiHeader = new();
     System.Windows.Forms.ColumnHeader DailyEnergyHeader = new();
+
+    #endregion
+
+
+    #region ==== Controls Events ====
+
+    private void Edit_Click(object? sender, EventArgs e)
+    {
+        if (Name.Text is "")
+            return;
+        MemberRoster.Roster[Name.Text] = new Member()
+        {
+            Name = Name.Text,
+            Height = Height.Text.ToFloat() ?? 0f,
+            Weight = Weight.Text.ToFloat() ?? 0f,
+            WorkIntensity = WorkIntensity.Text.DescriptionToEnum<WorkIntensityFlag>()
+        };
+        MemberRoster.Roster.EnqueueHistory();
+
+        Refresh();
+    }
+
+    private void Float_KeyPress(object? sender, KeyPressEventArgs e)
+    {
+        var tb = sender as TextBox;
+        if (tb is null)
+            return;
+        if (e.KeyChar is '.' && (tb.Text.IndexOf('.') is not -1 || tb.Text.Length is 0))
+            e.Handled = true;
+        if (!(e.KeyChar is '\b' || (e.KeyChar >= '0' && e.KeyChar <= '9') || e.KeyChar is '.'))
+            e.Handled = true;
+    }
+
+    private void Save_Click(object? sender, EventArgs e)
+    {
+        MemberRoster.Save();
+        Close();
+    }
+
+    private void MemberList_SelectedIndexChanged(object? sender, EventArgs e)
+    {
+        if (MemberList.SelectedItems.Count is 0)
+            return;
+        Name.Text = MemberList.SelectedItems[0].SubItems[0].Text;
+        Height.Text = MemberList.SelectedItems[0].SubItems[1].Text.ToFloat().ToString();
+        Weight.Text = MemberList.SelectedItems[0].SubItems[2].Text.ToFloat().ToString();
+        var flag = MemberList.SelectedItems[0].SubItems[3].Text.DescriptionToEnum<WorkIntensityFlag>();
+        WorkIntensity.SelectedIndex = flag is WorkIntensityFlag.None ? 0 : (int)flag - 1;
+    }
+
+    #endregion
 }

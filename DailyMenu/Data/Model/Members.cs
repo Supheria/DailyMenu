@@ -12,7 +12,7 @@ using System.Xml.Linq;
 
 namespace DailyMenu.Data.Model
 {
-    public class Members : IHistoryRecordable, IFileBackupManageable
+    public class Members : IHistoryRecordable
     {
         /// <summary>
         /// 以 Name 作为 Key 的所有成员
@@ -47,7 +47,7 @@ namespace DailyMenu.Data.Model
                 return totalDailyEnergy;
             }
         }
-        public Members() => _memberMap = new();
+        public Members() => _memberMap = [];
 
         public Members(Member[] members) : this()
         {
@@ -67,39 +67,35 @@ namespace DailyMenu.Data.Model
             return $"{_memberMap[member.Name].DailyEnergy() / TotalDailyEnergy * 100}%";
         }
 
+
         public int HistoryIndex { get; set; }
         public int CurrentHistoryLength { get; set; }
-        public FormattedData[] History { get; set; } = new FormattedData[20];
+        public string[] History { get; set; } = new string[20];
         public int LatestIndex { get; set; }
 
-        public FormattedData ToFormattedData()
+        public string HashCachePath => this.GetCachePath("hash test");
+
+        public string FileManageDirName => "ROSTER";
+
+        public string ToHashString()
         {
-            var hashString = this.GetHashString();
+            this.SaveToXml(HashCachePath, new MembersXmlSerialization());
+            using var data = new FileStream(HashCachePath, FileMode.Open);
+            var hashString = data.ToMd5HashString();
             if (!Directory.Exists(hashString))
                 this.SaveToXml(this.GetCachePath(hashString), new MembersXmlSerialization());
-            return new(hashString);
+            return hashString;
         }
 
-        public void FromFormattedData(FormattedData data) => _memberMap =
-            new MembersXmlSerialization().LoadFromXml(this.GetCachePath(data.Items[0]))?._memberMap ?? new();
-
-        public string FileManageDirName => $"ROSTER";
-
-        private string CachePath => this.GetCachePath("hash test");
-
-        public string GetHashString()
-        {
-            this.SaveToXml(CachePath, new MembersXmlSerialization());
-            using var data = new FileStream(CachePath, FileMode.Open);
-            return data.ToMd5HashString();
-        }
-
-        public string GetHashStringFromFilePath(string filePath)
+        public string ToHashString(string filePath)
         {
             new MembersXmlSerialization().LoadFromXml(filePath)
-                ?.SaveToXml(CachePath, new MembersXmlSerialization());
-            using var data = new FileStream(CachePath, FileMode.Open);
+                ?.SaveToXml(HashCachePath, new MembersXmlSerialization());
+            using var data = new FileStream(HashCachePath, FileMode.Open);
             return data.ToMd5HashString();
         }
+
+        public void FromHashString(string data) => _memberMap =
+            new MembersXmlSerialization().LoadFromXml(this.GetCachePath(data))?._memberMap ?? [];
     }
 }

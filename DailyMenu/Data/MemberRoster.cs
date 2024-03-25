@@ -25,7 +25,7 @@ public static class MemberRoster
     /// <param name="filePath"></param>
     public static void Load()
     {
-        FileCacheManager.ClearCache(Roster);
+        Roster.ClearCache();
         _ = new MembersXmlSerialization().LoadFromXml(FilePath, out var roster);
         Roster = roster ?? Roster;
         Roster.NewHistory();
