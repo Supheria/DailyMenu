@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using DailyMenu.Data.Model;
 using LocalUtilities;
 using LocalUtilities.SerializeUtilities;
 

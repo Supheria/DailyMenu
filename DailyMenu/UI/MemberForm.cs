@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using DailyMenu.Data;
+using DailyMenu.Data.Model;
 
 namespace DailyMenu.UI;
 
@@ -48,12 +50,6 @@ public partial class MemberForm : Form
         if (_resizing)
             return;
         DrawClient();
-    }
-
-    public void Show(Members members)
-    {
-        _members = members;
-        Show();
     }
 
     protected virtual void DrawClient()
@@ -314,6 +310,7 @@ public partial class MemberForm : Form
         Save.Text = "保存";
         Save.BackColor = buttonColor;
         Save.ForeColor = labelColor;
+        Save.Click += Save_Click;
         //
         // MemberList
         //
@@ -385,6 +382,11 @@ public partial class MemberForm : Form
         DailyEnergyHeader.Name = "DailyEnergyHeader";
         DailyEnergyHeader.Text = "日需能量";
         DailyEnergyHeader.TextAlign = HorizontalAlignment.Left;
+    }
+
+    private void Save_Click(object? sender, EventArgs e)
+    {
+        MemberRoster.Save();
     }
 
     private void MemberList_SelectedIndexChanged(object? sender, EventArgs e)

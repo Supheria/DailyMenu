@@ -3,6 +3,8 @@ using System.Drawing.Text;
 using LocalUtilities.SerializeUtilities;
 using LocalUtilities.ManageUtilities;
 using System.Windows.Forms;
+using DailyMenu.Data.Model;
+using DailyMenu.Data;
 
 namespace DailyMenu.UI;
 
@@ -14,9 +16,6 @@ public partial class MainForm : Form
     {
         InitializeComponent();
         SizeChanged += MainForm_SizeChanged;
-        _ = new MembersXmlSerialization().LoadFromXml("test.xml", out var members);
-        _members = members ?? _members;
-        _members.SaveToXml("test.xml", new MembersXmlSerialization());
         DrawClient();
     }
 
@@ -70,7 +69,9 @@ public partial class MainForm : Form
 
     private void MainMenu_Member_Click(object? sender, EventArgs e)
     {
-        MemberManager.Show(_members);
+        MemberRoster.Load();
+        Text = MemberRoster.Roster.IsEdit().ToString();
+        MemberManager.Show();
         MemberManager.WindowState = FormWindowState.Normal;
     }
 
@@ -78,8 +79,6 @@ public partial class MainForm : Form
     {
         DrawClient();
     }
-
-    private Members _members = new();
 
     PictureBox MemberList = new();
     private MenuStrip MainMenu = new();
@@ -121,10 +120,11 @@ public partial class MainForm : Form
         //stringFormat.Alignment = StringAlignment.Near;
         //stringFormat.LineAlignment = StringAlignment.Center;
         //stringFormat.Alignment = StringAlignment.Center;
+        MemberRoster.Load();
         string content = "";
-        foreach (var member in _members.MemberList)
+        foreach (var member in MemberRoster.Roster.MemberList)
         {
-            content += $"{member.Name}£º{_members.Percentage(member)}\n";
+            content += $"{member.Name}£º{MemberRoster.Roster.Percentage(member)}\n";
         }
         gMembers.DrawString(
             content,

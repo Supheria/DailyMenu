@@ -1,4 +1,5 @@
-﻿using DailyMenu.Flags;
+﻿using DailyMenu.Data.Model;
+using DailyMenu.Flags;
 using LocalUtilities.SerializeUtilities;
 using LocalUtilities.StringUtilities;
 using System;

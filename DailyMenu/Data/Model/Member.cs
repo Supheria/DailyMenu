@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DailyMenu;
+namespace DailyMenu.Data.Model;
 
 public class Member
 {
@@ -44,7 +44,7 @@ public class Member
     /// <summary>
     /// Bmi值
     /// </summary>
-    private float _bmi => Height is 0f ? 0f : (Weight / (Height * Height));
+    private float _bmi => Height is 0f ? 0f : Weight / (Height * Height);
     /// <summary>
     /// 劳动强度
     /// </summary>
@@ -66,7 +66,7 @@ public class Member
     public float DailyEnergy()
     {
         int standardUnitEnergy = 0;
-        switch (WorkIntensity) 
+        switch (WorkIntensity)
         {
             case WorkIntensityFlag.Weak:
                 standardUnitEnergy = StandardUnitEnergy(15);
