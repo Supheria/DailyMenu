@@ -10,8 +10,6 @@ namespace DailyMenu.UI;
 
 public partial class MainForm : Form
 {
-    private MemberForm MemberManager = new();
-
     public MainForm()
     {
         InitializeComponent();
@@ -71,8 +69,10 @@ public partial class MainForm : Form
     {
         MemberRoster.Load();
         Text = MemberRoster.Roster.IsEdit().ToString();
-        MemberManager.Show();
+        var MemberManager = new MemberForm();
+        MemberManager.ShowDialog();
         MemberManager.WindowState = FormWindowState.Normal;
+        DrawClient();
     }
 
     private void MainForm_SizeChanged(object? sender, EventArgs e)

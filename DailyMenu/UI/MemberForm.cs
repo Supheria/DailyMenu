@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using DailyMenu.Data;
 using DailyMenu.Data.Model;
+using DailyMenu.Flags;
+using LocalUtilities.StringUtilities;
 
 namespace DailyMenu.UI;
 
@@ -26,7 +28,6 @@ public partial class MemberForm : Form
     {
         InitializeComponent();
 
-        FormClosing += MemberForm_FormClosing;
         SizeChanged += MemberForm_SizeChanged;
         ResizeEnd += MemberForm_ResizeEnd;
         ResizeBegin += MemberForm_ResizeBegin;
@@ -147,6 +148,7 @@ public partial class MemberForm : Form
         Edit.Height = buttonHeight;
         Edit.Width = buttonWidth;
         Edit.Font = labelFont;
+        Edit.Click += Edit_Click;
         //
         // MemberList
         //
@@ -155,7 +157,7 @@ public partial class MemberForm : Form
         MemberList.Width = ClientRectangle.Width - padding * 2;
         MemberList.Height = ClientRectangle.Bottom - Edit.Bottom - padding * 4 - buttonHeight;
         MemberList.Font = new Font("宋体", base.Height * 0.05f, FontStyle.Regular, GraphicsUnit.Pixel); ;
-        var columnWidth = (MemberList.Width - padding) / MemberList.Columns.Count;
+        var columnWidth = (MemberList.Width - padding) / (MemberList.Columns.Count is 0 ? 1 : MemberList.Columns.Count);
         foreach (ColumnHeader c in MemberList.Columns)
             c.Width = columnWidth;
         //
@@ -182,13 +184,44 @@ public partial class MemberForm : Form
         ResumeLayout();
     }
 
-    public virtual new void Close() => Hide();
-
-    private void MemberForm_FormClosing(object? sender, FormClosingEventArgs e)
+    private void Edit_Click(object? sender, EventArgs e)
     {
-        Close();
-        e.Cancel = true;
-        Hide();
+        MemberRoster.Roster[Name.Text] = new Member()
+        {
+            Name = Name.Text,
+            Height = Height.Text.ToFloat() ?? 0f,
+            Weight = Weight.Text.ToFloat() ?? 0f,
+            WorkIntensity = WorkIntensity.Text.DescriptionToEnum<WorkIntensityFlag>()
+        };
+
+        Refresh();
+    }
+
+    private new void Refresh()
+    {
+        this.MemberList.BeginUpdate();   //数据更新，UI暂时挂起，直到EndUpdate绘制控件，可以有效避免闪烁并大大提高加载速度
+
+        MemberList.Items.Clear();
+        foreach(var m in MemberRoster.Roster.MemberList)
+        {
+            var item = new ListViewItem();
+            item.Text = m.Name;
+            item.SubItems.Add(m.Height.ToString());
+            item.SubItems.Add(m.Weight.ToString());
+            item.SubItems.Add(m.WorkIntensity.ToDescription());
+
+            this.MemberList.Items.Add(item);
+        }
+
+        this.MemberList.EndUpdate();  //结束数据处理，UI界面一次性绘制。
+
+        Invalidate();
+    }
+
+    public new void ShowDialog()
+    {
+        Refresh();
+        base.ShowDialog();
     }
 
     private void InitializeComponent()
@@ -265,6 +298,7 @@ public partial class MemberForm : Form
         Height.BorderStyle = BorderStyle.FixedSingle;
         Height.BackColor = backColor;
         Height.ForeColor = editColor;
+        Height.KeyPress += Float_KeyPress;
         //
         // Weight
         //
@@ -273,17 +307,12 @@ public partial class MemberForm : Form
         Weight.BorderStyle = BorderStyle.FixedSingle;
         Weight.BackColor = backColor;
         Weight.ForeColor = editColor;
+        Weight.KeyPress += Float_KeyPress;
         //
         // WorkIntensity
         //
         WorkIntensity.Name = "WorkIntensity";
-        WorkIntensity.Items.AddRange(new object[]
-        {
-            "极轻",
-            "轻度",
-            "中度",
-            "重度",
-        });
+        WorkIntensity.Items.AddRange(new WorkIntensityFlag().ToDescriptionList());
         WorkIntensity.SelectedIndex = 0;
         WorkIntensity.DropDownStyle = ComboBoxStyle.DropDownList;
         WorkIntensity.FlatStyle = FlatStyle.Popup;
@@ -327,25 +356,6 @@ public partial class MemberForm : Form
             DailyEnergyHeader,
         });
         MemberList.SelectedIndexChanged += MemberList_SelectedIndexChanged;
-        this.MemberList.BeginUpdate();   //数据更新，UI暂时挂起，直到EndUpdate绘制控件，可以有效避免闪烁并大大提高加载速度
-
-        for (int i = 0; i < 10; i++)   //添加10行数据
-        {
-            ListViewItem lvi = new ListViewItem();
-
-            lvi.ImageIndex = i;     //通过与imageList绑定，显示imageList中第i项图标
-
-            lvi.Text = "subitem" + i;
-
-            lvi.SubItems.Add("第2列,第" + i + "行");
-
-            lvi.SubItems.Add("第3列,第" + i + "行");
-            lvi.SubItems.Add("第3列,第" + i + "行");
-
-            this.MemberList.Items.Add(lvi);
-        }
-
-        this.MemberList.EndUpdate();  //结束数据处理，UI界面一次性绘制。
         //
         // NameHeader
         //
@@ -384,6 +394,17 @@ public partial class MemberForm : Form
         DailyEnergyHeader.TextAlign = HorizontalAlignment.Left;
     }
 
+    private void Float_KeyPress(object? sender, KeyPressEventArgs e)
+    {
+        var tb = sender as TextBox;
+        if (tb is null)
+            return;
+        if (e.KeyChar is '.' && (tb.Text.IndexOf('.') is not -1 || tb.Text.Length is 0))
+            e.Handled = true;
+        if (!(e.KeyChar is '\b' || (e.KeyChar >='0' && e.KeyChar <= '9') || e.KeyChar is '.'))
+            e.Handled = true;
+    }
+
     private void Save_Click(object? sender, EventArgs e)
     {
         MemberRoster.Save();
@@ -393,10 +414,11 @@ public partial class MemberForm : Form
     {
         if (MemberList.SelectedItems.Count is 0)
             return;
-        Name.Text = MemberList.SelectedItems[0].Text;
-        Height.Text = MemberList.SelectedItems[0].SubItems[0].Text;
-        Weight.Text = MemberList.SelectedItems[0].SubItems[1].Text;
-        WorkIntensity.Text = MemberList.SelectedItems[0].SubItems[2].Text;
+        Name.Text = MemberList.SelectedItems[0].SubItems[0].Text;
+        Height.Text = MemberList.SelectedItems[0].SubItems[1].Text.ToFloat().ToString();
+        Weight.Text = MemberList.SelectedItems[0].SubItems[2].Text.ToFloat().ToString();
+        var flag = MemberList.SelectedItems[0].SubItems[3].Text.DescriptionToEnum<WorkIntensityFlag>();
+        WorkIntensity.SelectedIndex = flag is WorkIntensityFlag.None ? 0 : (int)flag - 1;
     }
 
     System.Windows.Forms.Label NameLabel = new();
