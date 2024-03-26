@@ -1,10 +1,7 @@
-using DailyMenu.IO.Xml;
-using System.Drawing.Text;
-using LocalUtilities.SerializeUtilities;
-using LocalUtilities.ManageUtilities;
-using System.Windows.Forms;
-using DailyMenu.Data.Model;
 using DailyMenu.Data;
+using DailyMenu.UI.IO;
+using LocalUtilities.FileUtilities;
+using System.Drawing.Text;
 
 namespace DailyMenu.UI;
 
@@ -25,8 +22,8 @@ public partial class MainForm : Form
         // MainMenu
         // 
         MainMenu.ImageScalingSize = new Size(24, 24);
-        MainMenu.Items.AddRange(new ToolStripItem[] 
-        { 
+        MainMenu.Items.AddRange(new ToolStripItem[]
+        {
             MainMenu_Member,
         });
         MainMenu.Location = new Point(0, 0);
@@ -69,9 +66,9 @@ public partial class MainForm : Form
     {
         MemberRoster.Load();
         Text = MemberRoster.Roster.IsEdit().ToString();
-        var MemberManager = new MemberForm();
-        MemberManager.ShowDialog();
-        MemberManager.WindowState = FormWindowState.Normal;
+        _ = new MemberFormSerialization().LoadFromXml(new MemberForm().GetInitializationFilePath(), out var memberForm);
+        memberForm ??= new();
+        memberForm.ShowDialog();
         DrawClient();
     }
 

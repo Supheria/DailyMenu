@@ -1,11 +1,6 @@
-﻿using DailyMenu.Data.Model;
-using DailyMenu.IO.Xml;
-using LocalUtilities.ManageUtilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DailyMenu.Data.IO;
+using DailyMenu.Data.Model;
+using LocalUtilities.FileUtilities;
 
 namespace DailyMenu.Data;
 

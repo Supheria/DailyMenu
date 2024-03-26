@@ -1,29 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Drawing.Text;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using DailyMenu.Data;
+﻿using DailyMenu.Data;
 using DailyMenu.Data.Model;
 using DailyMenu.Flags;
-using LocalUtilities.ManageUtilities;
+using DailyMenu.UI.IO;
+using LocalUtilities.Interface;
+using LocalUtilities.FileUtilities;
 using LocalUtilities.StringUtilities;
 
 namespace DailyMenu.UI;
 
-public partial class MemberForm : Form
+public partial class MemberForm : Form, IInitializationManageable
 {
 
-    internal float SizeRatio = 0.618f;
-    internal float LengthMaxlRatio = 3f;
+    public float SizeRatio { get; set; } = 0.618f;
 
-    private Members _members = new();
+    public string IniFileName => "member form.xml";
+
     private bool _resizing = false;
+
+    private bool _isEditing = false;
 
     #region ==== Main Events ====
 
@@ -44,18 +38,22 @@ public partial class MemberForm : Form
         if (MemberRoster.Roster.IsEdit() is false)
         {
             MemberRoster.Roster.ClearCache();
-            return;
         }
-        var result = MessageBox.Show("是否保存当前编辑？", "提示", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-        switch (result)
+        else
         {
-            case DialogResult.Cancel:
-                e.Cancel = true;
-                break;
-            case DialogResult.Yes:
-                MemberRoster.Save();
-                break;
+            var result = MessageBox.Show("是否保存当前编辑？", "提示", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+            switch (result)
+            {
+                case DialogResult.Cancel:
+                    e.Cancel = true;
+                    return;
+                case DialogResult.Yes:
+                    MemberRoster.Save();
+                    break;
+            }
+
         }
+        this.SaveToXml(this.GetInitializationFilePath(), new MemberFormSerialization());
     }
 
     private void MemberForm_ResizeBegin(object? sender, EventArgs e)
@@ -192,24 +190,14 @@ public partial class MemberForm : Form
         //
         //
         //
-        var buttonWidth = ClientRectangle.Width / 3;
         var buttonHeight = (int)(ClientRectangle.Height * 0.1f);
-        //
-        // Edit
-        //
-        Edit.Left = ClientRectangle.Left + buttonWidth;
-        Edit.Top = Name.Bottom + padding;
-        Edit.Height = buttonHeight;
-        Edit.Width = buttonWidth;
-        Edit.Font = labelFont;
-        Edit.Click += Edit_Click;
         //
         // MemberList
         //
         MemberList.Left = ClientRectangle.Left + padding;
-        MemberList.Top = Edit.Bottom + padding;
+        MemberList.Top = Name.Bottom + padding;
         MemberList.Width = ClientRectangle.Width - padding * 2;
-        MemberList.Height = ClientRectangle.Bottom - Edit.Bottom - padding * 4 - buttonHeight;
+        MemberList.Height = ClientRectangle.Bottom - Name.Bottom - padding * 4 - buttonHeight;
         MemberList.Font = new Font("宋体", base.Height * 0.05f, FontStyle.Regular, GraphicsUnit.Pixel); ;
         var columnWidth = (MemberList.Width - padding) / (MemberList.Columns.Count is 0 ? 1 : MemberList.Columns.Count);
         foreach (ColumnHeader c in MemberList.Columns)
@@ -217,7 +205,7 @@ public partial class MemberForm : Form
         //
         //
         //
-        buttonWidth = ClientRectangle.Width / 5;
+        var buttonWidth = ClientRectangle.Width / 5;
         var buttonTop = MemberList.Bottom + padding;
         //
         // Delete
@@ -262,19 +250,16 @@ public partial class MemberForm : Form
             Height,
             Weight,
             WorkIntensity,
-            Edit,
             Delete,
             Save,
             MemberList,
         });
-        TopMost = true;
-        MinimumSize = Size = new(500, (int)(500 * SizeRatio));
-        BackColor = backColor;
+        MinimumSize = new(500, (int)(500 * SizeRatio));
         Location = new(
-            (Screen.GetBounds(this).Width / 2) - (this.Width / 2),
-            (Screen.GetBounds(this).Height / 2) - (base.Height / 2)
-            );
-        //MinimizeBox = MaximizeBox = false;
+                (Screen.GetBounds(this).Width / 2) - (this.Width / 2),
+                (Screen.GetBounds(this).Height / 2) - (base.Height / 2)
+                );
+        BackColor = backColor;
         DoubleBuffered = true;
         SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
         //
@@ -309,6 +294,10 @@ public partial class MemberForm : Form
         Name.BorderStyle = BorderStyle.FixedSingle;
         Name.BackColor = backColor;
         Name.ForeColor = editColor;
+        Name.KeyPress += Name_KeyPress;
+        Name.TextChanged += Editing;
+        Name.GotFocus += Name_GotFocus;
+        Name.LostFocus += FinishEdition;
         //
         // Height
         //
@@ -318,6 +307,9 @@ public partial class MemberForm : Form
         Height.BackColor = backColor;
         Height.ForeColor = editColor;
         Height.KeyPress += Float_KeyPress;
+        Height.TextChanged += Editing;
+        Height.GotFocus += Height_GotFocus; ;
+        Height.LostFocus += FinishEdition;
         //
         // Weight
         //
@@ -327,6 +319,9 @@ public partial class MemberForm : Form
         Weight.BackColor = backColor;
         Weight.ForeColor = editColor;
         Weight.KeyPress += Float_KeyPress;
+        Weight.TextChanged += Editing;
+        Weight.GotFocus += Weight_GotFocus;
+        Weight.LostFocus += FinishEdition;
         //
         // WorkIntensity
         //
@@ -337,13 +332,9 @@ public partial class MemberForm : Form
         WorkIntensity.FlatStyle = FlatStyle.Popup;
         WorkIntensity.BackColor = backColor;
         WorkIntensity.ForeColor = editColor;
-        //
-        // Edit
-        //
-        Edit.Name = "Add";
-        Edit.Text = "添改";
-        Edit.BackColor = buttonColor;
-        Edit.ForeColor = labelColor;
+        WorkIntensity.SelectedIndexChanged += Editing;
+        WorkIntensity.GotFocus += WorkIntensity_GotFocus; ;
+        WorkIntensity.LostFocus += FinishEdition;
         //
         // Delete
         //
@@ -421,7 +412,6 @@ public partial class MemberForm : Form
     new System.Windows.Forms.TextBox Height = new();
     System.Windows.Forms.TextBox Weight = new();
     System.Windows.Forms.ComboBox WorkIntensity = new();
-    System.Windows.Forms.Button Edit = new();
     System.Windows.Forms.Button Delete = new();
     System.Windows.Forms.Button Save = new();
     System.Windows.Forms.ListView MemberList = new();
@@ -437,9 +427,9 @@ public partial class MemberForm : Form
 
     #region ==== Controls Events ====
 
-    private void Edit_Click(object? sender, EventArgs e)
+    private void Editing(object? sender, EventArgs e)
     {
-        if (Name.Text is "")
+        if (_isEditing is false || Name.Text is "" || Height.Text is "" || Weight.Text is "")
             return;
         MemberRoster.Roster[Name.Text] = new Member()
         {
@@ -480,6 +470,34 @@ public partial class MemberForm : Form
         var flag = MemberList.SelectedItems[0].SubItems[3].Text.DescriptionToEnum<WorkIntensityFlag>();
         WorkIntensity.SelectedIndex = flag is WorkIntensityFlag.None ? 0 : (int)flag - 1;
     }
+
+    private void WorkIntensity_GotFocus(object? sender, EventArgs e) => _isEditing = true;
+
+    private void Weight_GotFocus(object? sender, EventArgs e)
+    {
+        Weight.Text = "";
+        _isEditing = true;
+    }
+
+    private void Height_GotFocus(object? sender, EventArgs e)
+    {
+        Height.Text = "";
+        _isEditing = true;
+    }
+
+    private void Name_GotFocus(object? sender, EventArgs e)
+    {
+        Name.Text = Height.Text = Weight.Text = "";
+        _isEditing = true;
+    }
+
+    private void Name_KeyPress(object? sender, KeyPressEventArgs e)
+    {
+        if (e.KeyChar is ' ' || e.KeyChar is '\n' || e.KeyChar is '\t')
+            e.Handled = true;
+    }
+
+    private void FinishEdition(object? sender, EventArgs e) => _isEditing = false;
 
     #endregion
 }

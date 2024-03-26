@@ -1,7 +1,7 @@
 ﻿using LocalUtilities.SerializeUtilities;
 using System.Xml.Serialization;
 
-namespace LocalUtilities.ManageUtilities;
+namespace LocalUtilities.FileUtilities;
 
 public static class XmlFileSaverLoader
 {
