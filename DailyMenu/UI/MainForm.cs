@@ -66,9 +66,7 @@ public partial class MainForm : Form
     {
         MemberRoster.Load();
         Text = MemberRoster.Roster.IsEdit().ToString();
-        _ = new MemberFormSerialization().LoadFromXml(new MemberForm().GetInitializationFilePath(), out var memberForm);
-        memberForm ??= new();
-        memberForm.ShowDialog();
+        new MemberForm().ShowDialog();
         DrawClient();
     }
 

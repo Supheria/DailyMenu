@@ -5,13 +5,14 @@ using DailyMenu.UI.IO;
 using LocalUtilities.Interface;
 using LocalUtilities.FileUtilities;
 using LocalUtilities.StringUtilities;
+using DailyMenu.IO.UI;
 
 namespace DailyMenu.UI;
 
 public partial class MemberForm : Form, IInitializationManageable
 {
 
-    public float SizeRatio { get; set; } = 0.618f;
+    private float SizeRatio { get; set; } = 0.618f;
 
     public string IniFileName => "member form.xml";
 
@@ -53,7 +54,12 @@ public partial class MemberForm : Form, IInitializationManageable
             }
 
         }
-        this.SaveToXml(this.GetInitializationFilePath(), new MemberFormSerialization());
+        new MemberFormData() {
+            Size = Size,
+            SizeRatio = SizeRatio,
+            Location = Location,
+            WindowState = WindowState,
+        }.SaveToXml(this.GetInitializationFilePath(), new MemberFormDataSerialization());
     }
 
     private void MemberForm_ResizeBegin(object? sender, EventArgs e)
@@ -96,6 +102,14 @@ public partial class MemberForm : Form, IInitializationManageable
 
     public new void ShowDialog()
     {
+        _ = new MemberFormDataSerialization().LoadFromXml(new MemberForm().GetInitializationFilePath(), out var memberForm);
+        if (memberForm is not null)
+        {
+            Size = memberForm.Size;
+            SizeRatio = memberForm.SizeRatio;
+            Location = memberForm.Location;
+            WindowState = memberForm.WindowState;
+        }
         Refresh();
         base.ShowDialog();
     }
@@ -342,6 +356,7 @@ public partial class MemberForm : Form, IInitializationManageable
         Delete.Text = "删除";
         Delete.BackColor = buttonColor;
         Delete.ForeColor = labelColor;
+        Delete.Click += Delete_Click;
         //
         // Save
         //
@@ -458,6 +473,16 @@ public partial class MemberForm : Form, IInitializationManageable
     {
         MemberRoster.Save();
         Close();
+    }
+
+    private void Delete_Click(object? sender, EventArgs e)
+    {
+        MemberRoster.Roster.Remove(MemberList.SelectedItems[0].SubItems[0].Text);
+        Refresh();
+        MemberRoster.Roster.EnqueueHistory();
+        MemberRoster.Roster.EnqueueHistory();
+        MemberRoster.Roster.EnqueueHistory();
+        MemberRoster.Roster.EnqueueHistory();
     }
 
     private void MemberList_SelectedIndexChanged(object? sender, EventArgs e)

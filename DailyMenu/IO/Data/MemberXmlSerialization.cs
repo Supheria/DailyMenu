@@ -5,7 +5,7 @@ using LocalUtilities.StringUtilities;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace DailyMenu.Data.IO;
+namespace DailyMenu.IO.Data;
 
 [XmlRoot(nameof(Member))]
 public class MemberXmlSerialization : XmlSerialization<Member>

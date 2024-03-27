@@ -25,6 +25,7 @@ public class Members : IHistoryRecordable
         get => _memberMap[name];
         set => _memberMap[name] = value;
     }
+    public void Remove(string name) => _memberMap.Remove(name);
     /// <summary>
     /// 每日所需总能量
     /// </summary>

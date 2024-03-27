@@ -1,4 +1,5 @@
 ﻿using DailyMenu.Flags;
+using DailyMenu.IO.UI;
 using LocalUtilities.SerializeUtilities;
 using LocalUtilities.StringUtilities;
 using System.Xml;
@@ -7,9 +8,9 @@ using System.Xml.Serialization;
 namespace DailyMenu.UI.IO;
 
 [XmlRoot(nameof(MemberForm))]
-public class MemberFormSerialization : XmlSerialization<MemberForm>
+public class MemberFormDataSerialization : XmlSerialization<MemberFormData>
 {
-    public MemberFormSerialization() : base(nameof(MemberForm))
+    public MemberFormDataSerialization() : base(nameof(MemberForm))
     {
     }
 
@@ -32,8 +33,6 @@ public class MemberFormSerialization : XmlSerialization<MemberForm>
 
     public override void WriteXml(XmlWriter writer)
     {
-        if (Source is null)
-            return;
         writer.WriteAttributeString(nameof(Source.Size),
             StringSimpleTypeConverter.ToArrayString(Source.Size.Width, Source.Size.Height));
         writer.WriteAttributeString(nameof(Source.SizeRatio), Source.SizeRatio.ToString());
