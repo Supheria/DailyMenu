@@ -444,15 +444,14 @@ public partial class MemberForm : Form, IInitializationManageable
 
     private void Editing(object? sender, EventArgs e)
     {
-        if (_isEditing is false || Name.Text is "" || Height.Text is "" || Weight.Text is "")
+        if (_isEditing is false || Height.Text is "" || Weight.Text is "")
             return;
-        MemberRoster.Roster[Name.Text] = new Member()
-        {
-            Name = Name.Text,
-            Height = Height.Text.ToFloat() ?? 0f,
-            Weight = Weight.Text.ToFloat() ?? 0f,
-            WorkIntensity = WorkIntensity.Text.DescriptionToEnum<WorkIntensityFlag>()
-        };
+        MemberRoster.Roster[Name.Text] = new Member(
+            Name.Text,
+            Height.Text.ToFloat() ?? 0f,
+            Weight.Text.ToFloat() ?? 0f,
+            WorkIntensity.Text.DescriptionToEnum<WorkIntensityFlag>()
+            );
         MemberRoster.Roster.EnqueueHistory();
 
         Refresh();
@@ -479,9 +478,6 @@ public partial class MemberForm : Form, IInitializationManageable
     {
         MemberRoster.Roster.Remove(MemberList.SelectedItems[0].SubItems[0].Text);
         Refresh();
-        MemberRoster.Roster.EnqueueHistory();
-        MemberRoster.Roster.EnqueueHistory();
-        MemberRoster.Roster.EnqueueHistory();
         MemberRoster.Roster.EnqueueHistory();
     }
 

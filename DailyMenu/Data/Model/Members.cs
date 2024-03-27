@@ -2,6 +2,7 @@
 using LocalUtilities.Interface;
 using LocalUtilities.FileUtilities;
 using LocalUtilities.StringUtilities;
+using DailyMenu.Flags;
 
 namespace DailyMenu.Data.Model;
 
@@ -20,10 +21,15 @@ public class Members : IHistoryRecordable
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public Member this[string name]
+    public Member? this[string name]
     {
-        get => _memberMap[name];
-        set => _memberMap[name] = value;
+        get => _memberMap.ContainsKey(name) ? _memberMap[name] : null;
+        set
+        {
+            if (name is "")
+                return;
+            _memberMap[name] = value ?? new("", 0f, 0f, WorkIntensityFlag.None);
+        }
     }
     public void Remove(string name) => _memberMap.Remove(name);
     /// <summary>

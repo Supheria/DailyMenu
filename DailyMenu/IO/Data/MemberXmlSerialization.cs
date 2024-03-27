@@ -16,13 +16,12 @@ public class MemberXmlSerialization : XmlSerialization<Member>
 
     public override void ReadXml(XmlReader reader)
     {
-        Source = new()
-        {
-            Name = reader.GetAttribute(nameof(Source.Name)) ?? string.Empty,
-            Height = reader.GetAttribute(nameof(Source.Height)).ToFloat() ?? 0f,
-            Weight = reader.GetAttribute(nameof(Source.Weight)).ToFloat() ?? 0f,
-            WorkIntensity = reader.GetAttribute(nameof(Source.WorkIntensity)).ToEnum<WorkIntensityFlag>(),
-        };
+        Source = new(
+            reader.GetAttribute(nameof(Source.Name)) ?? "",
+            reader.GetAttribute(nameof(Source.Height)).ToFloat() ?? 0f,
+            reader.GetAttribute(nameof(Source.Weight)).ToFloat() ?? 0f,
+            reader.GetAttribute(nameof(Source.WorkIntensity)).ToEnum<WorkIntensityFlag>()
+            );
     }
 
     public override void WriteXml(XmlWriter writer)

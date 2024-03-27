@@ -2,20 +2,24 @@
 
 namespace DailyMenu.Data.Model;
 
-public class Member
+public class Member(string name,float height, float weight, WorkIntensityFlag workIntensity)
 {
     /// <summary>
     /// 名字
     /// </summary>
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; } = name;
     /// <summary>
     /// 身高(m)
     /// </summary>
-    public float Height { get; set; } = 0;
+    public float Height { get; } = height;
     /// <summary>
     /// 体重(kg)
     /// </summary>
-    public float Weight { get; set; } = 0f;
+    public float Weight { get; } = weight;
+    /// <summary>
+    /// 劳动强度
+    /// </summary>
+    public WorkIntensityFlag WorkIntensity { get; } = workIntensity;
     /// <summary>
     /// Bmi指标
     /// </summary>
@@ -39,20 +43,6 @@ public class Member
     /// Bmi值
     /// </summary>
     private float _bmi => Height is 0f ? 0f : Weight / (Height * Height);
-    /// <summary>
-    /// 劳动强度
-    /// </summary>
-    public WorkIntensityFlag WorkIntensity { get; set; } = WorkIntensityFlag.None;
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="height"></param>
-    /// <param name="weight"></param>
-    /// <param name="workIntensity"></param>
-    public Member()
-    {
-    }
     /// <summary>
     /// 每日所需能量
     /// </summary>

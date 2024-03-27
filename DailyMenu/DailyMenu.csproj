@@ -18,8 +18,4 @@
     <ProjectReference Include="..\_lib\LocalUtilities\LocalUtilities.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="IO\Data\" />
-  </ItemGroup>
-
 </Project>

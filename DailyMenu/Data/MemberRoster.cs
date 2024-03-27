@@ -13,7 +13,7 @@ public static class MemberRoster
     /// <summary>
     /// 名册文件路径
     /// </summary>
-    public static string FilePath { get; private set; } = "./roster.xml";
+    public static string FilePath { get; private set; } = "./member.xml";
     /// <summary>
     /// 从文件加载名册
     /// </summary>
