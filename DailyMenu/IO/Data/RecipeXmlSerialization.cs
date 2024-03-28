@@ -14,10 +14,10 @@ public class RecipeXmlSerialization : XmlSerialization<Recipe>
 
     public override void ReadXml(XmlReader reader)
     {
-        var name = reader.GetAttribute(nameof(Source.Title)) ?? "";
+        var title = reader.GetAttribute(nameof(Source.Title)) ?? "";
         var recipe = new Dictionary<string, uint>();
         recipe.ReadXmlCollection(reader, LocalRootName, new RecipeItemXmlSerialization());
-        Source = new(name, recipe);
+        Source = new(title, recipe);
     }
 
     public override void WriteXml(XmlWriter writer)

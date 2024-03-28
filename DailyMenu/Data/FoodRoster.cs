@@ -26,5 +26,5 @@ public static class FoodRoster
     /// <summary>
     /// 保存当前名册
     /// </summary>
-    public static void Save() => Roster.SaveToXml(Path.ChangeExtension(FilePath, ".xml"), new FoodsXmlSerialization());
+    public static void Save() => Roster.SaveToXml(FilePath, new FoodsXmlSerialization());
 }

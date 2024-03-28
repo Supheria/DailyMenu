@@ -26,5 +26,5 @@ public static class FoodExchangeRoster
     /// <summary>
     /// 保存当前名册
     /// </summary>
-    public static void Save() => Roster.SaveToXml(Path.ChangeExtension(FilePath, ".xml"), new FoodExchangesXmlSerialization());
+    public static void Save() => Roster.SaveToXml(FilePath, new FoodExchangesXmlSerialization());
 }
