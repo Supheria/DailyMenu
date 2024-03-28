@@ -1,17 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using LocalUtilities.Interface;
+using System.Xml.Linq;
 
 namespace DailyMenu.Data.Model;
 
-public class FoodExchange(string category, int mass, float protein, float fat, float carbo)
+public class FoodExchange(string category, int mass, float protein, float fat, float carbo) : IRosterItem
 {
+
+    public string Name => _category;
+
+    string _category = category;
     /// <summary>
     /// 食物类型
     /// </summary>
-    public string Category { get; } = category;
+    public string Category => _category;
     /// <summary>
     /// 每交换份质量
     /// </summary>

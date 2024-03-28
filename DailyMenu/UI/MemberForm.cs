@@ -1,11 +1,11 @@
 ﻿using DailyMenu.Data;
 using DailyMenu.Data.Model;
 using DailyMenu.Flags;
-using DailyMenu.UI.IO;
-using LocalUtilities.Interface;
-using LocalUtilities.FileUtilities;
-using LocalUtilities.StringUtilities;
 using DailyMenu.IO.UI;
+using DailyMenu.UI.IO;
+using LocalUtilities.FileUtilities;
+using LocalUtilities.Interface;
+using LocalUtilities.StringUtilities;
 
 namespace DailyMenu.UI;
 
@@ -54,7 +54,8 @@ public partial class MemberForm : Form, IInitializationManageable
             }
 
         }
-        new MemberFormData() {
+        new MemberFormData()
+        {
             Size = Size,
             SizeRatio = SizeRatio,
             Location = Location,
@@ -85,7 +86,7 @@ public partial class MemberForm : Form, IInitializationManageable
         this.MemberList.BeginUpdate();
 
         MemberList.Items.Clear();
-        foreach (var m in MemberRoster.Roster.MemberList)
+        foreach (var m in MemberRoster.Roster.RosterList)
         {
             var item = new ListViewItem();
             item.Text = m.Name;
@@ -141,7 +142,7 @@ public partial class MemberForm : Form, IInitializationManageable
         NameLabel.Font = labelFont;
         NameLabel.TextAlign = ContentAlignment.MiddleLeft;
         //
-        // Name
+        // Title
         //
         Name.Left = NameLabel.Left + padding;
         Name.Top = NameLabel.Bottom + padding;
@@ -301,7 +302,7 @@ public partial class MemberForm : Form, IInitializationManageable
         WorkIntensityLabel.BackColor = backColor;
         WorkIntensityLabel.ForeColor = labelColor;
         //
-        // Name
+        // Title
         //
         Name.Name = "Name";
         Name.TextAlign = HorizontalAlignment.Center;

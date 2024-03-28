@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DailyMenu.Data.Model;
+﻿namespace DailyMenu.Data.Model;
 
 public class Nutrient(int energy, float protein, float fat, float carbo)
 {

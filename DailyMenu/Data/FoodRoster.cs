@@ -4,27 +4,27 @@ using LocalUtilities.FileUtilities;
 
 namespace DailyMenu.Data;
 
-public static class FoodExchangeRoster
+public static class FoodRoster
 {
     /// <summary>
-    /// 全局食物交换份名册
+    /// 全局食物名册
     /// </summary>
-    public static FoodExchanges Roster { get; private set; } = new();
+    public static Foods Roster { get; private set; } = new();
     /// <summary>
     /// 名册文件路径
     /// </summary>
-    public static string FilePath { get; private set; } = "./food exchange.xml";
+    public static string FilePath { get; private set; } = "./food.xml";
     /// <summary>
     /// 从文件加载名册
     /// </summary>
     /// <param name="filePath"></param>
     public static void Load()
     {
-        _ = new FoodExchangesXmlSerialization().LoadFromXml(FilePath, out var roster);
+        _ = new FoodsXmlSerialization().LoadFromXml(FilePath, out var roster);
         Roster = roster ?? Roster;
     }
     /// <summary>
     /// 保存当前名册
     /// </summary>
-    public static void Save() => Roster.SaveToXml(Path.ChangeExtension(FilePath, ".xml"), new FoodExchangesXmlSerialization());
+    public static void Save() => Roster.SaveToXml(Path.ChangeExtension(FilePath, ".xml"), new FoodsXmlSerialization());
 }

@@ -1,5 +1,4 @@
 using DailyMenu.Data;
-using DailyMenu.UI.IO;
 using LocalUtilities.FileUtilities;
 using System.Drawing.Text;
 
@@ -117,7 +116,7 @@ public partial class MainForm : Form
         //stringFormat.Alignment = StringAlignment.Center;
         MemberRoster.Load();
         string content = "";
-        foreach (var member in MemberRoster.Roster.MemberList)
+        foreach (var member in MemberRoster.Roster.RosterList)
         {
             content += $"{member.Name}£º{MemberRoster.Roster.Percentage(member)}\n";
         }

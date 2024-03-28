@@ -1,14 +1,8 @@
 ﻿using DailyMenu.Data.Model;
-using DailyMenu.Flags;
 using LocalUtilities.SerializeUtilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using LocalUtilities.StringUtilities;
 using System.Xml;
 using System.Xml.Serialization;
-using LocalUtilities.StringUtilities;
 
 
 namespace DailyMenu.IO.Data;

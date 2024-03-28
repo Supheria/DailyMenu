@@ -1,5 +1,4 @@
-﻿using DailyMenu.Flags;
-using DailyMenu.IO.UI;
+﻿using DailyMenu.IO.UI;
 using LocalUtilities.SerializeUtilities;
 using LocalUtilities.StringUtilities;
 using System.Xml;

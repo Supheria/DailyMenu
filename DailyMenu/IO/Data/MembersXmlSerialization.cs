@@ -7,23 +7,10 @@ using System.Xml.Serialization;
 namespace DailyMenu.Data.IO;
 
 [XmlRoot(nameof(Members))]
-public class MembersXmlSerialization : XmlSerialization<Members>
+public class MembersXmlSerialization : RosterXmlSerialization<Members, Member>
 {
-    public MembersXmlSerialization() : base(nameof(Members))
+    public MembersXmlSerialization() : base(nameof(Members), new MemberXmlSerialization(), new())
     {
-    }
 
-    public override void ReadXml(XmlReader reader)
-    {
-        var members = new List<Member>();
-        members.ReadXmlCollection(reader, LocalRootName, new MemberXmlSerialization());
-        Source = new(members.ToArray());
-    }
-
-    public override void WriteXml(XmlWriter writer)
-    {
-        if (Source is null)
-            return;
-        Source.MemberList.WriteXmlCollection(writer, new MemberXmlSerialization());
     }
 }

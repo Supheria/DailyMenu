@@ -1,13 +1,13 @@
 ﻿using DailyMenu.Flags;
+using LocalUtilities.Interface;
 
 namespace DailyMenu.Data.Model;
 
-public class Member(string name,float height, float weight, WorkIntensityFlag workIntensity)
+public class Member(string name, float height, float weight, WorkIntensityFlag workIntensity) : IRosterItem
 {
-    /// <summary>
-    /// 名字
-    /// </summary>
-    public string Name { get; } = name;
+    string _name = name;
+
+    public string Name => _name;
     /// <summary>
     /// 身高(m)
     /// </summary>
@@ -20,6 +20,10 @@ public class Member(string name,float height, float weight, WorkIntensityFlag wo
     /// 劳动强度
     /// </summary>
     public WorkIntensityFlag WorkIntensity { get; } = workIntensity;
+    /// <summary>
+    /// Bmi值
+    /// </summary>
+    float _bmi => Height is 0f ? 0f : Weight / (Height * Height);
     /// <summary>
     /// Bmi指标
     /// </summary>
@@ -39,10 +43,6 @@ public class Member(string name,float height, float weight, WorkIntensityFlag wo
             return BmiFlag.Fat;
         }
     }
-    /// <summary>
-    /// Bmi值
-    /// </summary>
-    private float _bmi => Height is 0f ? 0f : Weight / (Height * Height);
     /// <summary>
     /// 每日所需能量
     /// </summary>

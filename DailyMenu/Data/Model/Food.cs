@@ -1,19 +1,12 @@
-﻿using DailyMenu.IO.Data;
-using LocalUtilities.FileUtilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using LocalUtilities.Interface;
 
 namespace DailyMenu.Data.Model;
 
-public class Food(string name, string category)
+public class Food(string name, string category) : IRosterItem
 {
-    /// <summary>
-    /// 名称
-    /// </summary>
-    public string Name { get; } = name;
+    string _name = name;
+
+    public string Name => _name;
     /// <summary>
     /// 食物类型
     /// </summary>
