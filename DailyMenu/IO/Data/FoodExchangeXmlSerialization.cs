@@ -18,7 +18,7 @@ public class FoodExchangeXmlSerialization : XmlSerialization<FoodExchange>
     {
         Source = new(
             reader.GetAttribute(nameof(Source.Category)) ?? string.Empty,
-            reader.GetAttribute(nameof(Source.Mass)).ToInt() ?? 0,
+            reader.GetAttribute(nameof(Source.Mass)).ToUint() ?? 0,
             reader.GetAttribute(nameof(Source.Protein)).ToFloat() ?? 0f,
             reader.GetAttribute(nameof(Source.Fat)).ToFloat() ?? 0f,
             reader.GetAttribute(nameof(Source.Carbo)).ToFloat() ?? 0f

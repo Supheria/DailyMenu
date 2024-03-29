@@ -15,7 +15,7 @@ public class RecipeXmlSerialization : XmlSerialization<Recipe>
     public override void ReadXml(XmlReader reader)
     {
         var title = reader.GetAttribute(nameof(Source.Title)) ?? "";
-        var recipe = new Dictionary<string, uint>();
+        var recipe = new Dictionary<string, float>();
         recipe.ReadXmlCollection(reader, LocalRootName, new RecipeItemXmlSerialization());
         Source = new(title, recipe);
     }

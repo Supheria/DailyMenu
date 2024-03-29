@@ -17,7 +17,7 @@ public class Food(string name, string category) : IRosterItem
     /// </summary>
     /// <param name="weight"></param>
     /// <returns></returns>
-    public Nutrient? GetContent(int weight)
+    public Nutrient? GetContent(float weight)
     {
         var exchange = FoodExchangeRoster.Roster[Category];
         if (exchange is null)

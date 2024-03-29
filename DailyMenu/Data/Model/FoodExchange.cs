@@ -3,7 +3,7 @@ using System.Xml.Linq;
 
 namespace DailyMenu.Data.Model;
 
-public class FoodExchange(string category, int mass, float protein, float fat, float carbo) : IRosterItem
+public class FoodExchange(string category, uint mass, float protein, float fat, float carbo) : IRosterItem
 {
 
     public string Name => _category;
@@ -16,11 +16,11 @@ public class FoodExchange(string category, int mass, float protein, float fat, f
     /// <summary>
     /// 每交换份质量
     /// </summary>
-    public int Mass { get; } = mass;
+    public uint Mass { get; } = mass;
     /// <summary>
     /// 每交换份能量
     /// </summary>
-    public int Energy { get; } = 90;
+    public uint Energy { get; } = 90;
     /// <summary>
     /// 蛋白质
     /// </summary>
