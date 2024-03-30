@@ -17,27 +17,6 @@ public partial class MainForm : Form
     {
         var backColor = Color.White;
         var foreColor = Color.DarkBlue;
-        // 
-        // MainMenu
-        // 
-        MainMenu.ImageScalingSize = new Size(24, 24);
-        MainMenu.Items.AddRange(new ToolStripItem[]
-        {
-            MainMenu_Member,
-        });
-        MainMenu.Location = new Point(0, 0);
-        MainMenu.Name = "MainMenu";
-        MainMenu.Padding = new Padding(9, 3, 0, 3);
-        MainMenu.Size = new Size(1232, 34);
-        MainMenu.TabIndex = 1;
-        MainMenu.Text = "MainMenu";
-        // 
-        // MainMenu_Member
-        // 
-        MainMenu_Member.Name = "MainMenu_Member";
-        MainMenu_Member.Size = new Size(62, 28);
-        MainMenu_Member.Text = "成员";
-        MainMenu_Member.Click += MainMenu_Member_Click;
         //
         // main
         //
@@ -59,12 +38,47 @@ public partial class MainForm : Form
         //MinimizeBox = MaximizeBox = false;
         DoubleBuffered = true;
         SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+        // 
+        // DailyMenu
+        // 
+        MainMenu.ImageScalingSize = new Size(24, 24);
+        MainMenu.Items.AddRange(new ToolStripItem[]
+        {
+            MainMenu_Member,
+            MainMenu_Menu,
+        });
+        MainMenu.Location = new Point(0, 0);
+        MainMenu.Name = "MainMenu";
+        MainMenu.Padding = new Padding(9, 3, 0, 3);
+        MainMenu.Size = new Size(1232, 34);
+        MainMenu.TabIndex = 1;
+        MainMenu.Text = "MainMenu";
+        // 
+        // MainMenu_Member
+        // 
+        MainMenu_Member.Name = "MainMenu_Member";
+        MainMenu_Member.Size = new Size(62, 28);
+        MainMenu_Member.Text = "成员";
+        MainMenu_Member.Click += MainMenu_Member_Click;
+        // 
+        // MainMenu_Menu
+        // 
+        MainMenu_Menu.Name = "MainMenu_Menu";
+        MainMenu_Menu.Size = new Size(62, 28);
+        MainMenu_Menu.Text = "食谱";
+        MainMenu_Menu.Click += MainMenu_Menu_Click;
+    }
+
+    private void MainMenu_Menu_Click(object? sender, EventArgs e)
+    {
+        TodayMenu.Load();
+        new MenuForm().ShowDialog();
+        DrawClient();
     }
 
     private void MainMenu_Member_Click(object? sender, EventArgs e)
     {
         MemberRoster.Load();
-        Text = MemberRoster.Roster.IsEdit().ToString();
         new MemberForm().ShowDialog();
         DrawClient();
     }
@@ -77,6 +91,7 @@ public partial class MainForm : Form
     PictureBox MemberList = new();
     private MenuStrip MainMenu = new();
     private ToolStripMenuItem MainMenu_Member = new();
+    private ToolStripMenuItem MainMenu_Menu = new();
 
     protected virtual void DrawClient()
     {

@@ -9,7 +9,7 @@ using LocalUtilities.FileUtilities;
 
 namespace DailyMenu.Data;
 
-public static class MainMenu
+public static class TodayMenu
 {
     /// <summary>
     /// 全局菜单名册
