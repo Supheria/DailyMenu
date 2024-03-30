@@ -4,16 +4,13 @@ using System.Drawing.Text;
 
 namespace DailyMenu.UI;
 
-public partial class MainForm : Form
+public partial class MainForm : RosterForm
 {
-    public MainForm()
+    public MainForm() : base("main form")
     {
-        InitializeComponent();
-        SizeChanged += MainForm_SizeChanged;
-        DrawClient();
     }
 
-    private void InitializeComponent()
+    protected override void InitializeComponent()
     {
         var backColor = Color.White;
         var foreColor = Color.DarkBlue;
@@ -93,7 +90,7 @@ public partial class MainForm : Form
     private ToolStripMenuItem MainMenu_Member = new();
     private ToolStripMenuItem MainMenu_Menu = new();
 
-    protected virtual void DrawClient()
+    protected override void DrawClient()
     {
         if (WindowState == FormWindowState.Minimized)
         {
@@ -144,5 +141,9 @@ public partial class MainForm : Form
             );
         gMembers.Flush(); gMembers.Dispose();
         ResumeLayout();
+    }
+
+    protected override void UpdateAllData()
+    {
     }
 }

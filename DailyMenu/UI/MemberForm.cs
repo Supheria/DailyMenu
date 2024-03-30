@@ -9,29 +9,16 @@ using LocalUtilities.StringUtilities;
 
 namespace DailyMenu.UI;
 
-public partial class MemberForm : Form, IInitializationManageable
+public partial class MemberForm : RosterForm
 {
-
-    private float SizeRatio { get; set; } = 0.618f;
-
-    public string IniFileName => "member form.xml";
-
-    private bool _resizing = false;
 
     private bool _isEditing = false;
 
     #region ==== Main Events ====
 
-    public MemberForm()
+    public MemberForm() : base("member form")
     {
-        InitializeComponent();
-
         FormClosing += MemberForm_FormClosing;
-        SizeChanged += MemberForm_SizeChanged;
-        ResizeEnd += MemberForm_ResizeEnd;
-        ResizeBegin += MemberForm_ResizeBegin;
-
-        DrawClient();
     }
 
     private void MemberForm_FormClosing(object? sender, FormClosingEventArgs e)
@@ -52,36 +39,10 @@ public partial class MemberForm : Form, IInitializationManageable
                     MemberRoster.Save();
                     break;
             }
-
         }
-        new MemberFormData()
-        {
-            Size = Size,
-            SizeRatio = SizeRatio,
-            Location = Location,
-            WindowState = WindowState,
-        }.SaveToXml(this.GetInitializationFilePath(), new MemberFormDataSerialization());
     }
 
-    private void MemberForm_ResizeBegin(object? sender, EventArgs e)
-    {
-        _resizing = true;
-    }
-
-    private void MemberForm_ResizeEnd(object? sender, EventArgs e)
-    {
-        _resizing = false;
-        DrawClient();
-    }
-
-    private void MemberForm_SizeChanged(object? sender, EventArgs e)
-    {
-        if (_resizing)
-            return;
-        DrawClient();
-    }
-
-    private new void Refresh()
+    private void UpdateMemberList()
     {
         this.MemberList.BeginUpdate();
 
@@ -101,26 +62,12 @@ public partial class MemberForm : Form, IInitializationManageable
         Invalidate();
     }
 
-    public new void ShowDialog()
-    {
-        _ = new MemberFormDataSerialization().LoadFromXml(new MemberForm().GetInitializationFilePath(), out var memberForm);
-        if (memberForm is not null)
-        {
-            Size = memberForm.Size;
-            SizeRatio = memberForm.SizeRatio;
-            Location = memberForm.Location;
-            WindowState = memberForm.WindowState;
-        }
-        Refresh();
-        base.ShowDialog();
-    }
-
     #endregion
 
 
     #region ==== Draw Client ====
 
-    private void DrawClient()
+    protected override void DrawClient()
     {
         if (WindowState == FormWindowState.Minimized)
         {
@@ -246,7 +193,7 @@ public partial class MemberForm : Form, IInitializationManageable
 
     #region ==== Initialize ====
 
-    private void InitializeComponent()
+    protected override void InitializeComponent()
     {
         var backColor = Color.White;
         var labelColor = Color.DarkRed;
@@ -269,14 +216,7 @@ public partial class MemberForm : Form, IInitializationManageable
             Save,
             MemberList,
         });
-        MinimumSize = new(500, (int)(500 * SizeRatio));
-        Location = new(
-                (Screen.GetBounds(this).Width / 2) - (this.Width / 2),
-                (Screen.GetBounds(this).Height / 2) - (base.Height / 2)
-                );
-        BackColor = backColor;
-        DoubleBuffered = true;
-        SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+        MinimumSize = new(500, (int)(500 * 0.618f));
         //
         // NameLabel
         //
@@ -310,7 +250,6 @@ public partial class MemberForm : Form, IInitializationManageable
         Name.BackColor = backColor;
         Name.ForeColor = editColor;
         Name.KeyPress += Name_KeyPress;
-        Name.TextChanged += Editing;
         Name.GotFocus += Name_GotFocus;
         Name.LostFocus += FinishEdition;
         //
@@ -322,7 +261,6 @@ public partial class MemberForm : Form, IInitializationManageable
         Height.BackColor = backColor;
         Height.ForeColor = editColor;
         Height.KeyPress += Float_KeyPress;
-        Height.TextChanged += Editing;
         Height.GotFocus += Height_GotFocus; ;
         Height.LostFocus += FinishEdition;
         //
@@ -334,7 +272,6 @@ public partial class MemberForm : Form, IInitializationManageable
         Weight.BackColor = backColor;
         Weight.ForeColor = editColor;
         Weight.KeyPress += Float_KeyPress;
-        Weight.TextChanged += Editing;
         Weight.GotFocus += Weight_GotFocus;
         Weight.LostFocus += FinishEdition;
         //
@@ -347,8 +284,6 @@ public partial class MemberForm : Form, IInitializationManageable
         WorkIntensity.FlatStyle = FlatStyle.Popup;
         WorkIntensity.BackColor = backColor;
         WorkIntensity.ForeColor = editColor;
-        WorkIntensity.SelectedIndexChanged += Editing;
-        WorkIntensity.GotFocus += WorkIntensity_GotFocus; ;
         WorkIntensity.LostFocus += FinishEdition;
         //
         // Delete
@@ -445,17 +380,7 @@ public partial class MemberForm : Form, IInitializationManageable
 
     private void Editing(object? sender, EventArgs e)
     {
-        if (_isEditing is false || Height.Text is "" || Weight.Text is "")
-            return;
-        MemberRoster.Roster[Name.Text] = new Member(
-            Name.Text,
-            Height.Text.ToFloat() ?? 0f,
-            Weight.Text.ToFloat() ?? 0f,
-            WorkIntensity.Text.DescriptionToEnum<WorkIntensityFlag>()
-            );
-        MemberRoster.Roster.EnqueueHistory();
-
-        Refresh();
+        
     }
 
     private void Float_KeyPress(object? sender, KeyPressEventArgs e)
@@ -478,7 +403,7 @@ public partial class MemberForm : Form, IInitializationManageable
     private void Delete_Click(object? sender, EventArgs e)
     {
         MemberRoster.Roster.Remove(MemberList.SelectedItems[0].SubItems[0].Text);
-        Refresh();
+        UpdateMemberList();
         MemberRoster.Roster.EnqueueHistory();
     }
 
@@ -493,24 +418,21 @@ public partial class MemberForm : Form, IInitializationManageable
         WorkIntensity.SelectedIndex = flag is WorkIntensityFlag.None ? 0 : (int)flag - 1;
     }
 
-    private void WorkIntensity_GotFocus(object? sender, EventArgs e) => _isEditing = true;
+    //private void WorkIntensity_GotFocus(object? sender, EventArgs e) => _isEditing = true;
 
     private void Weight_GotFocus(object? sender, EventArgs e)
     {
         Weight.Text = "";
-        _isEditing = true;
     }
 
     private void Height_GotFocus(object? sender, EventArgs e)
     {
         Height.Text = "";
-        _isEditing = true;
     }
 
     private void Name_GotFocus(object? sender, EventArgs e)
     {
         Name.Text = Height.Text = Weight.Text = "";
-        _isEditing = true;
     }
 
     private void Name_KeyPress(object? sender, KeyPressEventArgs e)
@@ -519,7 +441,22 @@ public partial class MemberForm : Form, IInitializationManageable
             e.Handled = true;
     }
 
-    private void FinishEdition(object? sender, EventArgs e) => _isEditing = false;
+    private void FinishEdition(object? sender, EventArgs e)
+    {
+        if (_isEditing || Height.Text is "" || Weight.Text is "")
+            return;
+        MemberRoster.Roster[Name.Text] = new Member(
+            Name.Text,
+            Height.Text.ToFloat() ?? 0f,
+            Weight.Text.ToFloat() ?? 0f,
+            WorkIntensity.Text.DescriptionToEnum<WorkIntensityFlag>()
+            );
+        MemberRoster.Roster.EnqueueHistory();
+
+        UpdateMemberList();
+    }
+
+    protected override void UpdateAllData() => UpdateMemberList();
 
     #endregion
 }

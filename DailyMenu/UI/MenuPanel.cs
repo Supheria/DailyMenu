@@ -15,10 +15,9 @@ namespace DailyMenu.UI
     {
         public MenuPanel()
         {
-            BackColor = Color.Red;
             InitializeComponent();
 
-            Resize += MenuPanel_Resize;
+            SizeChanged += MenuPanel_Resize;
 
             DrawClient();
         }
@@ -28,7 +27,7 @@ namespace DailyMenu.UI
             DrawClient();
         }
 
-        private void DrawClient()
+        protected void DrawClient()
         {
             if (Visible == false)
                 return;
@@ -37,9 +36,16 @@ namespace DailyMenu.UI
             var listFont = new Font("黑体", base.Height * 0.05f, FontStyle.Regular, GraphicsUnit.Pixel);
             var editFont = new Font("仿宋", base.Height * 0.075f, FontStyle.Regular, GraphicsUnit.Pixel);
             var numericWidth = (int)(ClientRectangle.Width * 0.2f);
-            var numericHeight = (int)(ClientRectangle.Height * 0.5f);
             var listWidth = (ClientRectangle.Width - numericWidth - padding * 4) / 2;
             var listHeight = ClientRectangle.Height - padding * 2;
+            //
+            // RecipeLabel
+            //
+            RecipeLabel.Left = ClientRectangle.Left + padding;
+            RecipeLabel.Top = ClientRectangle.Top + padding;
+            RecipeLabel.Width = listWidth;
+            RecipeLabel.Height = listHeight;
+            RecipeLabel.Font = listFont;
             //
             // RecipeList
             //
@@ -51,19 +57,19 @@ namespace DailyMenu.UI
             //
             // Copies
             //
-            Copies.Left = RecipeList.Left + padding;
-            Copies.Top = ClientRectangle.Top + ClientRectangle.Height - (ClientRectangle.Height - numericHeight) / 2;
+            Copies.Left = RecipeList.Right + padding;
+            Copies.Top = ClientRectangle.Top + (ClientRectangle.Height - Copies.Height) / 2;
             Copies.Width = numericWidth;
             Copies.Font = editFont;
             Copies.TextAlign = HorizontalAlignment.Center;
             //
-            // HeightLabel
+            // MenuList
             //
-            RecipeList.Left = Copies.Left + padding;
-            RecipeList.Top = ClientRectangle.Top + padding;
-            RecipeList.Width = listWidth;
-            RecipeList.Height = listHeight;
-            RecipeList.Font = listFont;
+            MenuList.Left = Copies.Right + padding;
+            MenuList.Top = ClientRectangle.Top + padding;
+            MenuList.Width = listWidth;
+            MenuList.Height = listHeight;
+            MenuList.Font = listFont;
             
             ResumeLayout();
         }
@@ -79,10 +85,16 @@ namespace DailyMenu.UI
                 MenuList,
                 Copies,
                 ]);
+            //
+            // RecipeLabel
+            //
+            RecipeLabel.Text = "食谱列表";
         }
 
+        Label RecipeLabel = new();
+        Label MenuLabel = new();
         ListView RecipeList = new();
         ListView MenuList = new();
-        NumericUpDown Copies = new();
+        TextBox Copies = new();
     }
 }

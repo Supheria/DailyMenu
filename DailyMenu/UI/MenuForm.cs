@@ -10,25 +10,15 @@ using System.Windows.Forms;
 
 namespace DailyMenu.UI
 {
-    public partial class MenuForm : Form
+    public partial class MenuForm : RosterForm
     {
         float SizeRatio { get; set; } = 0.618f;
 
-        public MenuForm()
+        public MenuForm() : base("menu form")
         {
-            InitializeComponent();
-
-            Resize += MenuForm_Resize;
-
-            DrawClient();
         }
 
-        private void MenuForm_Resize(object? sender, EventArgs e)
-        {
-            DrawClient();
-        }
-
-        private void DrawClient()
+        protected override void DrawClient()
         {
             if (Visible == false)
                 return;
@@ -52,7 +42,7 @@ namespace DailyMenu.UI
             ResumeLayout();
         }
 
-        private void InitializeComponent()
+        protected override void InitializeComponent()
         {
             var backColor = Color.White;
             MinimumSize = new(500, (int)(500 * SizeRatio));
@@ -67,6 +57,11 @@ namespace DailyMenu.UI
                 MenuPanel,
             ]);
             //MenuPanel.Visible = false;
+        }
+
+        protected override void UpdateAllData()
+        {
+            
         }
 
         MenuPanel MenuPanel = new();

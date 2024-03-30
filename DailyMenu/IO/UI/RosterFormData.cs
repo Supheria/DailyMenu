@@ -1,10 +1,8 @@
 ﻿namespace DailyMenu.IO.UI;
 
-public class MemberFormData
+public class RosterFormData
 {
     public Size Size { get; set; }
-
-    public float SizeRatio { get; set; }
 
     public Point Location { get; set; }
 

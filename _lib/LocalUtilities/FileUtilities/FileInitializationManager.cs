@@ -7,7 +7,7 @@ public static class FileInitializationManager
     /// <summary>
     /// 根目录
     /// </summary>
-    private static readonly DirectoryInfo RootDirectoryInfo = Directory.CreateDirectory("ini");
+    private static readonly DirectoryInfo RootDirectoryInfo = Directory.CreateDirectory(@".\ini");
 
     /// <summary>
     /// 获取配置文件路径
@@ -17,8 +17,11 @@ public static class FileInitializationManager
     /// <returns></returns>
     public static string GetInitializationFilePath<T>(this T obj) where T : IInitializationManageable
     {
+        RootDirectoryInfo.Refresh();
+        if (RootDirectoryInfo.Exists is false)
+            RootDirectoryInfo.Create();
         var cachePath = Path.Combine(RootDirectoryInfo.FullName, obj.IniFileName);
-        return cachePath;
+        return Path.ChangeExtension(cachePath, ".xml");
     }
 
     /// <summary>
