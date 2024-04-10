@@ -1,10 +1,8 @@
-﻿namespace DailyMenu.IO.UI;
+﻿using LocalUtilities.UIUtilities;
 
-public class RosterFormData
+namespace DailyMenu.IO.UI;
+
+public class RosterFormData : FormData
 {
-    public Size Size { get; set; }
-
-    public Point Location { get; set; }
-
-    public FormWindowState WindowState { get; set; }
+    public Color BackColor { get; set; }
 }

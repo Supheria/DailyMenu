@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
-namespace DailyMenu.UI
+﻿namespace DailyMenu.UI
 {
     public partial class MenuForm : RosterForm
     {
@@ -37,7 +27,7 @@ namespace DailyMenu.UI
             MenuPanel.Top = ClientRectangle.Top + padding;
             MenuPanel.Width = ClientRectangle.Width - padding * 2;
             MenuPanel.Height = ClientRectangle.Height - padding * 2;
-            
+
 
             ResumeLayout();
         }
@@ -61,7 +51,7 @@ namespace DailyMenu.UI
 
         protected override void UpdateAllData()
         {
-            
+
         }
 
         MenuPanel MenuPanel = new();

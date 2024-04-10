@@ -1,5 +1,4 @@
 ﻿using LocalUtilities.Interface;
-using System.Xml.Linq;
 
 namespace DailyMenu.Data.Model;
 

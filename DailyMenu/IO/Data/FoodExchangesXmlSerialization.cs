@@ -1,6 +1,5 @@
 ﻿using DailyMenu.Data.Model;
 using LocalUtilities.SerializeUtilities;
-using System.Xml;
 using System.Xml.Serialization;
 
 namespace DailyMenu.IO.Data;

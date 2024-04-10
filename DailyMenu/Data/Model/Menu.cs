@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DailyMenu.Data.Model;
+﻿namespace DailyMenu.Data.Model;
 
 public class Menu(string date, Dictionary<string, uint> menu)
 {

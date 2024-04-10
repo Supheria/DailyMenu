@@ -1,10 +1,7 @@
 ﻿using DailyMenu.Data;
 using DailyMenu.Data.Model;
 using DailyMenu.Flags;
-using DailyMenu.IO.UI;
-using DailyMenu.UI.IO;
 using LocalUtilities.FileUtilities;
-using LocalUtilities.Interface;
 using LocalUtilities.StringUtilities;
 
 namespace DailyMenu.UI;
@@ -380,7 +377,7 @@ public partial class MemberForm : RosterForm
 
     private void Editing(object? sender, EventArgs e)
     {
-        
+
     }
 
     private void Float_KeyPress(object? sender, KeyPressEventArgs e)
