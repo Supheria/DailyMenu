@@ -2,16 +2,17 @@
 
 namespace DailyMenu.Data.Model;
 
-public class Food(string name, string category) : IRosterItem
+public class Food(string signature) : RosterItem<string>(signature)
 {
-    string _name = name;
-
-    public string Name => _name;
     /// <summary>
     /// 食物类型
     /// </summary>
-    public string Category { get; } = category;
+    public string Category { get; set; } = "";
 
+    public Food() : this("")
+    {
+
+    }
     /// <summary>
     /// 一定重量食物的营养素含量
     /// </summary>
@@ -19,7 +20,7 @@ public class Food(string name, string category) : IRosterItem
     /// <returns></returns>
     public Nutrient? GetContent(float weight)
     {
-        var exchange = FoodExchangeRoster.Roster[Category];
+        var exchange = Rosters.FoodExchanges[Category];
         if (exchange is null)
             return null;
         var copies = weight / (exchange.Mass is 0 ? 1 : exchange.Mass);

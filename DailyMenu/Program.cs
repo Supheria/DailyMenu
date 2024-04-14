@@ -19,12 +19,4 @@ internal static class Program
         ApplicationConfiguration.Initialize();
         Application.Run(new MainForm());
     }
-
-    static void Test()
-    {
-        var r = new Recipe("test", new() { ["a"] = 1, ["b"] = 2 });
-        r.SaveToXml("test.xml", new RecipeXmlSerialization());
-        var r2 = new RecipeXmlSerialization().LoadFromXml("test.xml");
-        var a = r2.Title;
-    }
 }

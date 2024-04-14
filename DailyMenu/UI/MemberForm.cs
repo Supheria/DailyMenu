@@ -1,28 +1,30 @@
 ﻿using DailyMenu.Data;
+using DailyMenu.Data.IO;
 using DailyMenu.Data.Model;
 using DailyMenu.Flags;
+using DailyMenu.IO.UI;
 using LocalUtilities.FileUtilities;
 using LocalUtilities.StringUtilities;
 
 namespace DailyMenu.UI;
 
-public partial class MemberForm : RosterForm
+public partial class MemberForm : RosterForm<MemberFormData>
 {
 
     private bool _isEditing = false;
 
     #region ==== Main Events ====
 
-    public MemberForm() : base("member form")
+    public MemberForm() : base(new(), new MemberFormDataSerialization())
     {
         FormClosing += MemberForm_FormClosing;
     }
 
     private void MemberForm_FormClosing(object? sender, FormClosingEventArgs e)
     {
-        if (MemberRoster.Roster.IsEdit() is false)
+        if (Rosters.Members.IsEditThanLastSavedHistory() is false)
         {
-            MemberRoster.Roster.ClearCache();
+            Rosters.Members.ClearCache();
         }
         else
         {
@@ -33,7 +35,7 @@ public partial class MemberForm : RosterForm
                     e.Cancel = true;
                     return;
                 case DialogResult.Yes:
-                    MemberRoster.Save();
+                    new MembersXmlSerialization() { Source = Rosters.Members }.SaveToXml();
                     break;
             }
         }
@@ -44,10 +46,10 @@ public partial class MemberForm : RosterForm
         this.MemberList.BeginUpdate();
 
         MemberList.Items.Clear();
-        foreach (var m in MemberRoster.Roster.RosterList)
+        foreach (var m in Rosters.Members.RosterList)
         {
             var item = new ListViewItem();
-            item.Text = m.Name;
+            item.Text = m.Signature;
             item.SubItems.Add(m.Height.ToString());
             item.SubItems.Add(m.Weight.ToString());
             item.SubItems.Add(m.WorkIntensity.ToDescription());
@@ -55,6 +57,7 @@ public partial class MemberForm : RosterForm
             this.MemberList.Items.Add(item);
         }
         this.MemberList.EndUpdate();
+        Rosters.Members.EnqueueHistory();
 
         Invalidate();
     }
@@ -213,7 +216,6 @@ public partial class MemberForm : RosterForm
             Save,
             MemberList,
         });
-        MinimumSize = new(500, (int)(500 * 0.618f));
         //
         // NameLabel
         //
@@ -393,15 +395,15 @@ public partial class MemberForm : RosterForm
 
     private void Save_Click(object? sender, EventArgs e)
     {
-        MemberRoster.Save();
+        new MembersXmlSerialization() { Source = Rosters.Members }.SaveToXml();
+        Rosters.Members.UpdateLastSavedHistoryIndex();
         Close();
     }
 
     private void Delete_Click(object? sender, EventArgs e)
     {
-        MemberRoster.Roster.Remove(MemberList.SelectedItems[0].SubItems[0].Text);
+        Rosters.Members.Remove(MemberList.SelectedItems[0].SubItems[0].Text);
         UpdateMemberList();
-        MemberRoster.Roster.EnqueueHistory();
     }
 
     private void MemberList_SelectedIndexChanged(object? sender, EventArgs e)
@@ -442,13 +444,14 @@ public partial class MemberForm : RosterForm
     {
         if (_isEditing || Height.Text is "" || Weight.Text is "")
             return;
-        MemberRoster.Roster[Name.Text] = new Member(
-            Name.Text,
-            Height.Text.ToFloat() ?? 0f,
-            Weight.Text.ToFloat() ?? 0f,
-            WorkIntensity.Text.DescriptionToEnum<WorkIntensityFlag>()
-            );
-        MemberRoster.Roster.EnqueueHistory();
+        Rosters.Members[Name.Text] = new Member
+        {
+            Signature = Name.Text,
+            Height = Height.Text.ToFloat() ?? 0f,
+            Weight = Weight.Text.ToFloat() ?? 0f,
+            WorkIntensity = WorkIntensity.Text.DescriptionToEnum<WorkIntensityFlag>()
+        };
+        Rosters.Members.EnqueueHistory();
 
         UpdateMemberList();
     }

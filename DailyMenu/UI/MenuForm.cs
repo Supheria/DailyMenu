@@ -1,10 +1,12 @@
-﻿namespace DailyMenu.UI
+﻿using DailyMenu.IO.UI;
+
+namespace DailyMenu.UI
 {
-    public partial class MenuForm : RosterForm
+    public partial class MenuForm : RosterForm<MenuFormData>
     {
         float SizeRatio { get; set; } = 0.618f;
 
-        public MenuForm() : base("menu form")
+        public MenuForm() : base(new(), new MenuFormDataSerialization())
         {
         }
 
@@ -34,13 +36,6 @@
 
         protected override void InitializeComponent()
         {
-            var backColor = Color.White;
-            MinimumSize = new(500, (int)(500 * SizeRatio));
-            Location = new(
-                    (Screen.GetBounds(this).Width / 2) - (this.Width / 2),
-                    (Screen.GetBounds(this).Height / 2) - (base.Height / 2)
-                    );
-            BackColor = backColor;
             DoubleBuffered = true;
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             Controls.AddRange([

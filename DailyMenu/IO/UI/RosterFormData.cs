@@ -2,7 +2,7 @@
 
 namespace DailyMenu.IO.UI;
 
-public class RosterFormData : FormData
+public abstract class RosterFormData : FormData
 {
-    public Color BackColor { get; set; }
+    public virtual Color BackColor { get; set; } = Color.White;
 }

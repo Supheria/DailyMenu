@@ -1,14 +1,11 @@
 ﻿using DailyMenu.Data.Model;
+using LocalUtilities.Serializations;
 using LocalUtilities.SerializeUtilities;
 using System.Xml.Serialization;
 
 namespace DailyMenu.IO.Data;
 
-[XmlRoot(nameof(FoodExchanges))]
-public class FoodExchangesXmlSerialization : RosterXmlSerialization<FoodExchanges, FoodExchange>
+public class FoodExchangesXmlSerialization() : RosterXmlSerialization<FoodExchanges, string, FoodExchange>(new(), new FoodExchangeXmlSerialization())
 {
-    public FoodExchangesXmlSerialization() : base(nameof(FoodExchanges), new FoodExchangeXmlSerialization(), new())
-    {
-
-    }
+    public override string LocalName => nameof(FoodExchanges);
 }

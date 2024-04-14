@@ -1,11 +1,14 @@
 using DailyMenu.Data;
+using DailyMenu.Data.IO;
+using DailyMenu.IO.UI;
+using LocalUtilities.FileUtilities;
 using System.Drawing.Text;
 
 namespace DailyMenu.UI;
 
-public partial class MainForm : RosterForm
+public partial class MainForm : RosterForm<MainFormData>
 {
-    public MainForm() : base("main form")
+    public MainForm() : base(new(), new MainFormDataSerialization())
     {
     }
 
@@ -18,7 +21,6 @@ public partial class MainForm : RosterForm
         //
         AutoScaleDimensions = new SizeF(11F, 24F);
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size(800, 450);
         Name = "Daily Menu";
         Controls.AddRange(new Control[]
         {
@@ -26,11 +28,6 @@ public partial class MainForm : RosterForm
             MainMenu,
         });
         //MinimumSize = Size = new((int)(500 * SizeRatio), 500);
-        BackColor = backColor;
-        Location = new(
-            (Screen.GetBounds(this).Width / 2) - (this.Width / 2),
-            (Screen.GetBounds(this).Height / 2) - (this.Height / 2)
-            );
         //MinimizeBox = MaximizeBox = false;
         DoubleBuffered = true;
         SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
@@ -67,14 +64,12 @@ public partial class MainForm : RosterForm
 
     private void MainMenu_Menu_Click(object? sender, EventArgs e)
     {
-        TodayMenu.Load();
         new MenuForm().ShowDialog();
         DrawClient();
     }
 
     private void MainMenu_Member_Click(object? sender, EventArgs e)
     {
-        MemberRoster.Load();
         new MemberForm().ShowDialog();
         DrawClient();
     }
@@ -125,11 +120,11 @@ public partial class MainForm : RosterForm
         //stringFormat.Alignment = StringAlignment.Near;
         //stringFormat.LineAlignment = StringAlignment.Center;
         //stringFormat.Alignment = StringAlignment.Center;
-        MemberRoster.Load();
+        Rosters.Members = new MembersXmlSerialization().LoadFromXml(out _);
         string content = "";
-        foreach (var member in MemberRoster.Roster.RosterList)
+        foreach (var member in Rosters.Members.RosterList)
         {
-            content += $"{member.Name}£º{MemberRoster.Roster.Percentage(member)}\n";
+            content += $"{member.Signature}£º{Rosters.Members.Percentage(member)}\n";
         }
         gMembers.DrawString(
             content,

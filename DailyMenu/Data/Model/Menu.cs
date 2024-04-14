@@ -1,14 +1,17 @@
-﻿namespace DailyMenu.Data.Model;
+﻿using LocalUtilities.Interface;
 
-public class Menu(string date, Dictionary<string, uint> menu)
+namespace DailyMenu.Data.Model;
+
+public class Menu(string signature, Dictionary<string, uint> menu) : RosterItem<string>(signature)
 {
-    string _date = date;
-
-    public string Date => _date;
-
-    Dictionary<string, uint> _menu = menu;
+    Dictionary<string, uint> _menu { get; } = menu;
 
     public KeyValuePair<string, uint>[] MenuList => _menu.ToArray();
+
+    public Menu() : this("", [])
+    {
+
+    }
 
     public uint this[string recipeTitle]
     {
@@ -25,7 +28,7 @@ public class Menu(string date, Dictionary<string, uint> menu)
         var content = new Nutrient(0f, 0f, 0f, 0f);
         foreach (var recipeItem in _menu)
         {
-            var recipe = RecipeRoster.Roster[recipeItem.Key];
+            var recipe = Rosters.Recipes[recipeItem.Key];
             if (recipe is null)
                 continue;
             var recipeContent = recipe.GetContent(recipeItem.Value);

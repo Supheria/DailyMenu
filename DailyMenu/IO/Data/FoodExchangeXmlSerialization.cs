@@ -7,29 +7,23 @@ using System.Xml.Serialization;
 
 namespace DailyMenu.IO.Data;
 
-[XmlRoot(nameof(FoodExchange))]
-public class FoodExchangeXmlSerialization : XmlSerialization<FoodExchange>
+public class FoodExchangeXmlSerialization() : XmlSerialization<FoodExchange>(new())
 {
-    public FoodExchangeXmlSerialization() : base(nameof(FoodExchange))
-    {
-    }
+
+    public override string LocalName => nameof(FoodExchange);
 
     public override void ReadXml(XmlReader reader)
     {
-        Source = new(
-            reader.GetAttribute(nameof(Source.Category)) ?? string.Empty,
-            reader.GetAttribute(nameof(Source.Mass)).ToUint() ?? 0,
-            reader.GetAttribute(nameof(Source.Protein)).ToFloat() ?? 0f,
-            reader.GetAttribute(nameof(Source.Fat)).ToFloat() ?? 0f,
-            reader.GetAttribute(nameof(Source.Carbo)).ToFloat() ?? 0f
-            );
+        Source.Signature = reader.GetAttribute(nameof(Source.Signature)) ?? Source.Signature;
+        Source.Mass = reader.GetAttribute(nameof(Source.Mass)).ToUint() ?? Source.Mass;
+        Source.Protein = reader.GetAttribute(nameof(Source.Protein)).ToFloat() ?? Source.Protein;
+        Source.Fat = reader.GetAttribute(nameof(Source.Fat)).ToFloat() ?? Source.Fat;
+        Source.Carbo = reader.GetAttribute(nameof(Source.Carbo)).ToFloat() ?? Source.Carbo;
     }
 
     public override void WriteXml(XmlWriter writer)
     {
-        if (Source is null)
-            return;
-        writer.WriteAttributeString(nameof(Source.Category), Source.Category);
+        writer.WriteAttributeString(nameof(Source.Signature), Source.Signature);
         writer.WriteAttributeString(nameof(Source.Mass), Source.Mass.ToString());
         writer.WriteAttributeString(nameof(Source.Protein), Source.Protein.ToString());
         writer.WriteAttributeString(nameof(Source.Fat), Source.Fat.ToString());

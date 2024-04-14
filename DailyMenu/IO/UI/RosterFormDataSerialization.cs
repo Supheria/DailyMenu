@@ -5,10 +5,9 @@ using System.Xml.Serialization;
 
 namespace DailyMenu.UI.IO;
 
-[XmlRoot(nameof(RosterForm))]
-public class RosterFormDataSerialization : FormDataXmlSerialization
+public abstract class RosterFormDataSerialization<T> : FormDataXmlSerialization<T> where T : RosterFormData
 {
-    public RosterFormDataSerialization() : base(nameof(RosterForm))
+    public RosterFormDataSerialization(string localName, T rosterFormData) : base(localName, rosterFormData)
     {
         OnRead += Reading;
         OnWrite += Writing;
@@ -16,15 +15,11 @@ public class RosterFormDataSerialization : FormDataXmlSerialization
 
     private void Reading(XmlReader reader)
     {
-        var source = new RosterFormData();
-        source.BackColor = Color.FromName(reader.GetAttribute(nameof(source.BackColor)) ?? Color.White.Name);
-        Source = source;
+        Source.BackColor = Color.FromName(reader.GetAttribute(nameof(Source.BackColor)) ?? Color.White.Name);
     }
 
     private void Writing(XmlWriter writer)
     {
-        var source = Source as RosterFormData;
-        if (source is not null)
-            writer.WriteAttributeString(nameof(source.BackColor), source.BackColor.Name);
+        writer.WriteAttributeString(nameof(Source.BackColor), Source.BackColor.Name);
     }
 }

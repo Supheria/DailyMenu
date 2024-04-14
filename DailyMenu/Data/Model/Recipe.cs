@@ -2,17 +2,17 @@
 
 namespace DailyMenu.Data.Model;
 
-public class Recipe(string title, Dictionary<string, float> recipe) : IRosterItem
+public class Recipe(string signature, Dictionary<string, float> recipe) : RosterItem<string>(signature)
 {
-    public string Name => _title;
 
-    string _title = title;
-
-    public string Title => _title;
-
-    Dictionary<string, float> _recipe = recipe;
+    Dictionary<string, float> _recipe { get; } = recipe;
 
     public KeyValuePair<string, float>[] RecipeList => _recipe.ToArray();
+
+    public Recipe() : this("", [])
+    {
+
+    }
 
     public float this[string foodName]
     {
@@ -29,7 +29,7 @@ public class Recipe(string title, Dictionary<string, float> recipe) : IRosterIte
         Nutrient? content = null;
         foreach (var foodItem in _recipe)
         {
-            var food = FoodRoster.Roster[foodItem.Key];
+            var food = Rosters.Foods[foodItem.Key];
             if (food is null)
                 continue;
             var foodContent = food.GetContent(foodItem.Value);

@@ -3,23 +3,25 @@ using LocalUtilities.Interface;
 
 namespace DailyMenu.Data.Model;
 
-public class Member(string name, float height, float weight, WorkIntensityFlag workIntensity) : IRosterItem
+public class Member(string signature) : RosterItem<string>(signature)
 {
-    string _name = name;
-
-    public string Name => _name;
     /// <summary>
     /// 身高(m)
     /// </summary>
-    public float Height { get; } = height;
+    public float Height { get; set; }
     /// <summary>
     /// 体重(kg)
     /// </summary>
-    public float Weight { get; } = weight;
+    public float Weight { get; set; }
     /// <summary>
     /// 劳动强度
     /// </summary>
-    public WorkIntensityFlag WorkIntensity { get; } = workIntensity;
+    public WorkIntensityFlag WorkIntensity { get; set; } = WorkIntensityFlag.None;
+
+    public Member() : this("")
+    {
+
+    }
     /// <summary>
     /// Bmi值
     /// </summary>

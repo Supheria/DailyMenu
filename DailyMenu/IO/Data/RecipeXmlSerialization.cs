@@ -5,26 +5,21 @@ using System.Xml.Serialization;
 
 namespace DailyMenu.IO.Data;
 
-[XmlRoot(nameof(Recipe))]
-public class RecipeXmlSerialization : XmlSerialization<Recipe>
+public class RecipeXmlSerialization() : XmlSerialization<Recipe>(new())
 {
-    public RecipeXmlSerialization() : base(nameof(Recipe))
-    {
-    }
+    public override string LocalName => nameof(Recipe);
 
     public override void ReadXml(XmlReader reader)
     {
-        var title = reader.GetAttribute(nameof(Source.Title)) ?? "";
+        var signature = reader.GetAttribute(nameof(Source.Signature)) ?? "";
         var recipe = new Dictionary<string, float>();
-        recipe.ReadXmlCollection(reader, LocalRootName, new RecipeItemXmlSerialization());
-        Source = new(title, recipe);
+        recipe.ReadXmlCollection(reader, LocalName, new RecipeItemXmlSerialization());
+        Source = new(signature, recipe);
     }
 
     public override void WriteXml(XmlWriter writer)
     {
-        if (Source is null)
-            return;
-        writer.WriteAttributeString(nameof(Source.Title), Source.Title);
+        writer.WriteAttributeString(nameof(Source.Signature), Source.Signature);
         Source.RecipeList.WriteXmlCollection(writer, new RecipeItemXmlSerialization());
     }
 }

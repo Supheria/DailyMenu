@@ -2,7 +2,7 @@
 
 namespace DailyMenu.Data.Model;
 
-public class Recipes : Roster<Recipe>
+public class Recipes : Roster<string, Recipe>
 {
 
 }

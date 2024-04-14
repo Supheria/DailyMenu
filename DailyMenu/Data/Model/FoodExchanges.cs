@@ -2,7 +2,7 @@
 
 namespace DailyMenu.Data.Model;
 
-public class FoodExchanges : Roster<FoodExchange>
+public class FoodExchanges : Roster<string, FoodExchange>
 {
 
 }

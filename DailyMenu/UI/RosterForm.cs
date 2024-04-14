@@ -4,30 +4,23 @@ using LocalUtilities.UIUtilities;
 
 namespace DailyMenu.UI;
 
-public abstract class RosterForm : ResizeableForm
+public abstract class RosterForm<TRosterFormData> : ResizeableForm<TRosterFormData> where TRosterFormData : RosterFormData
 {
-    protected RosterForm(string iniFileName) : base(iniFileName)
+    protected RosterForm(TRosterFormData rosterFormData, RosterFormDataSerialization<TRosterFormData> rosterFormDataSerialization) : base(rosterFormData, rosterFormDataSerialization)
     {
-        BackColor = Color.White;
-        FormDataXmlSerialization = new RosterFormDataSerialization();
         OnLoadFormData += RosterForm_LoadIniData;
         OnSaveFormData += RosterForm_SaveIniData;
         Load += RosterForm_Load;
     }
 
-    private void RosterForm_LoadIniData(FormData formData)
+    private void RosterForm_LoadIniData()
     {
-        var data = formData as RosterFormData;
-        if (data is not null)
-            BackColor = data.BackColor;
+        BackColor = FormData.BackColor;
     }
 
-    private FormData RosterForm_SaveIniData()
+    private void RosterForm_SaveIniData()
     {
-        return new RosterFormData
-        {
-            BackColor = BackColor,
-        };
+        FormData.BackColor = BackColor;
     }
 
     private void RosterForm_Load(object? sender, EventArgs e) => UpdateAllData();
